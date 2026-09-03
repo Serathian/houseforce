@@ -157,7 +157,7 @@ export default function Home() {
                 <motion.div 
                   className="relative z-20 flex flex-col items-center"
                   initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0, y: (isMobile && expandedSide === 'left') ? -60 : 0 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={swipeTransition}
                   exit={{ opacity: 0, transition: { duration: 0.3 } }}
                   style={{ viewTransitionName: expandedSide === 'left' ? 'hero-text-const' : 'none' }}
@@ -198,7 +198,7 @@ export default function Home() {
                 <motion.div 
                   className="relative z-20 flex flex-col items-center"
                   initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0, y: (isMobile && expandedSide === 'right') ? 60 : 0 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={swipeTransition}
                   exit={{ opacity: 0, transition: { duration: 0.3 } }}
                   style={{ viewTransitionName: expandedSide === 'right' ? 'hero-text-key' : 'none' }}

@@ -70,17 +70,13 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
 
   const getExpandedPosition = (index: number, side: 'left' | 'right') => {
     if (isMobile) {
-      // 2 columns, 4 rows to give text labels plenty of breathing room horizontally
+      // 2 columns, 4 rows for a symmetrical ribcage layout
       const col = index % 2;
       const row = Math.floor(index / 2);
-      
-      // Horizontal spacing: 140px gap (-70 and +70 from center)
-      const x = -70 + (col * 140);
-      
-      // Vertical spacing: 95px gap for text below icon
-      // Construction text is Top, so icons go to Bottom (positive Y)
-      // Keyholding text is Bottom, so icons go to Top (negative Y)
-      const y = side === 'left' ? -70 + (row * 95) : -230 + (row * 95);
+      // Center icons tightly to leave maximum width for text on the edges
+      const x = col === 0 ? -30 : 30; 
+      // Anchor icons safely in their respective halves (Bottom half for Construction, Top half for Keyholding)
+      const y = side === 'left' ? 30 + (row * 60) : -210 + (row * 60);
       return { x, y };
     } else {
       const col = index % 2; 
@@ -148,7 +144,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                   transition={{ 
                     duration: 1.2,
                     ease: [0.16, 1, 0.3, 1],
-                    delay: isExpanded ? swipeTransition.duration + (i % 2) * 0.1 : 0 
+                    delay: isExpanded ? swipeTransition.duration + i * 0.05 : 0 
                   }}
                   onMouseEnter={(e) => handleMouseEnter(e, item.label, 'left')}
                   onMouseMove={(e) => handleMouseMove(e, item.label, 'left')}
@@ -173,10 +169,10 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                          transition={{ delay: swipeTransition.duration + 0.5 + (i % 2) * 0.1 }}
-                          className={`absolute w-48 ${isMobile ? 'top-[130%] left-1/2 -translate-x-1/2 text-center' : 'top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
+                          transition={{ delay: swipeTransition.duration + 0.5 + i * 0.05 }}
+                          className={`absolute ${isMobile ? (i % 2 === 0 ? 'w-[100px] top-1/2 -translate-y-1/2 right-[115%] text-right pr-1' : 'w-[100px] top-1/2 -translate-y-1/2 left-[115%] text-left pl-1') : 'w-48 top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
                         >
-                          <h3 className="font-bold text-white text-sm whitespace-nowrap drop-shadow-sm">{item.label}</h3>
+                          <h3 className={`font-bold text-white drop-shadow-sm ${isMobile ? 'text-[10px] uppercase tracking-wider leading-[1.2] whitespace-normal' : 'text-sm whitespace-nowrap'}`}>{item.label}</h3>
                           <p className={`text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm ${isMobile ? 'hidden' : 'block'}`}>{item.desc}</p>
                         </motion.div>
                       )}
@@ -228,7 +224,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                   transition={{ 
                     duration: 1.2,
                     ease: [0.16, 1, 0.3, 1],
-                    delay: isExpanded ? swipeTransition.duration + (i % 2) * 0.1 : 0 
+                    delay: isExpanded ? swipeTransition.duration + i * 0.05 : 0 
                   }}
                   onMouseEnter={(e) => handleMouseEnter(e, item.label, 'right')}
                   onMouseMove={(e) => handleMouseMove(e, item.label, 'right')}
@@ -253,10 +249,10 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                          transition={{ delay: swipeTransition.duration + 0.5 + (i % 2) * 0.1 }}
-                          className={`absolute w-48 ${isMobile ? 'top-[130%] left-1/2 -translate-x-1/2 text-center' : 'top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
+                          transition={{ delay: swipeTransition.duration + 0.5 + i * 0.05 }}
+                          className={`absolute ${isMobile ? (i % 2 === 0 ? 'w-[100px] top-1/2 -translate-y-1/2 right-[115%] text-right pr-1' : 'w-[100px] top-1/2 -translate-y-1/2 left-[115%] text-left pl-1') : 'w-48 top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
                         >
-                          <h3 className="font-bold text-white text-sm whitespace-nowrap drop-shadow-sm">{item.label}</h3>
+                          <h3 className={`font-bold text-white drop-shadow-sm ${isMobile ? 'text-[10px] uppercase tracking-wider leading-[1.2] whitespace-normal' : 'text-sm whitespace-nowrap'}`}>{item.label}</h3>
                           <p className={`text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm ${isMobile ? 'hidden' : 'block'}`}>{item.desc}</p>
                         </motion.div>
                       )}
