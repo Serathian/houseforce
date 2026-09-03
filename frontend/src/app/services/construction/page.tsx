@@ -1,9 +1,59 @@
 "use client";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Link } from 'next-view-transitions';
 import { constItems } from '@/data/services';
 
 export default function ConstructionPage() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    if (window.innerWidth >= 768) return;
+    
+    let animationId: number;
+    let isPaused = false;
+    let exactScroll = 0;
+    const scroll = () => {
+      if (!isPaused && el) {
+        exactScroll += 0.15;
+        
+        const duplicateStart = el.children[0].children[constItems.length] as HTMLElement;
+        if (duplicateStart) {
+          const jumpPoint = duplicateStart.offsetLeft - (el.children[0].children[0] as HTMLElement).offsetLeft;
+          if (exactScroll >= jumpPoint) {
+            exactScroll -= jumpPoint;
+          }
+        }
+        
+        el.scrollLeft = exactScroll;
+      }
+      animationId = requestAnimationFrame(scroll);
+    };
+
+    setTimeout(() => {
+      if (el) exactScroll = el.scrollLeft;
+      animationId = requestAnimationFrame(scroll);
+    }, 1000);
+
+    const pause = () => { isPaused = true; };
+    const resume = () => { 
+      isPaused = false; 
+      if (el) exactScroll = el.scrollLeft;
+    };
+    
+    el.addEventListener('touchstart', pause, { passive: true });
+    el.addEventListener('touchend', resume, { passive: true });
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+      el.removeEventListener('touchstart', pause);
+      el.removeEventListener('touchend', resume);
+    };
+  }, []);
+
   const services = [
     {
       title: 'Renovations & Remodeling',
@@ -52,14 +102,14 @@ export default function ConstructionPage() {
           </div>
 
           {/* Keyholding peeking sliver! */}
-          <div className="absolute right-0 top-0 h-full w-[48px] hover:w-[260px] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] cursor-pointer group/sliver z-50 pointer-events-auto overflow-hidden">
+          <div className="hidden md:block absolute right-0 top-0 h-full w-[48px] hover:w-[260px] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] cursor-pointer group/sliver z-50 pointer-events-auto overflow-hidden">
             <Link href="/services/keyholding" className="block w-full h-full relative">
               <div className="absolute right-0 top-0 w-[100vw] h-full bg-teal-800 opacity-95"></div>
               <div className="absolute right-0 top-0 w-[100vw] h-full bg-[url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
               
               <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center pl-3 w-[260px] opacity-70 group-hover/sliver:opacity-100 transition-opacity duration-300">
                  <svg className="w-6 h-6 text-white shrink-0 group-hover/sliver:-translate-x-1 transition-transform duration-300 drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                 <span className="ml-4 font-bold text-white text-lg tracking-wide whitespace-nowrap drop-shadow-md">Explore Keyholding</span>
+                 <span className="ml-4 font-bold text-white text-lg tracking-wide text-center max-w-full drop-shadow-md">Explore Keyholding</span>
               </div>
             </Link>
           </div>
@@ -71,9 +121,9 @@ export default function ConstructionPage() {
             className="flex flex-col items-center p-12 text-center"
             style={{ viewTransitionName: 'hero-text-const' }}
           >
-            <span className="text-blue-300 font-semibold tracking-wider uppercase text-sm mb-4">Led by Paul Reddy</span>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
-            <p className="text-lg text-blue-100 mb-8 max-w-sm font-light drop-shadow">
+            <span className="text-blue-300 font-semibold tracking-wider uppercase text-xs md:text-sm mb-2 md:mb-4">Led by Paul Reddy</span>
+            <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
+            <p className="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-sm font-light drop-shadow">
               30+ years of expertise. &quot;Quality First&quot; property renovations in Torrevieja.
             </p>
             <motion.div
@@ -87,12 +137,23 @@ export default function ConstructionPage() {
                 className="inline-flex flex-col items-center text-white/80 hover:text-white transition-colors group"
               >
                 <span className="text-xs font-bold tracking-widest uppercase mb-3 drop-shadow-md">Scroll to explore</span>
-                <div className="w-8 h-12 rounded-full border-2 border-white/50 flex justify-center p-1 group-hover:border-white transition-colors">
+                {/* Desktop Mouse Scroll */}
+                <div className="hidden md:flex justify-center items-center h-12">
                   <motion.div
-                    className="w-1 h-2.5 bg-white rounded-full mt-1"
-                    animate={{ y: [0, 12, 0], opacity: [1, 0.5, 1] }}
+                    animate={{ y: [0, 6, 0] }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                  />
+                  >
+                    <span className="material-symbols-outlined text-white/80 group-hover:text-white text-4xl transition-colors">mouse</span>
+                  </motion.div>
+                </div>
+                {/* Mobile Finger Swipe */}
+                <div className="md:hidden flex justify-center items-center h-12 overflow-visible">
+                  <motion.div
+                    animate={{ y: [10, -10, -10], opacity: [0, 1, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }}
+                  >
+                    <span className="material-symbols-outlined text-white/80 group-hover:text-white text-4xl transition-colors">swipe_up</span>
+                  </motion.div>
                 </div>
               </Link>
             </motion.div>
@@ -100,23 +161,23 @@ export default function ConstructionPage() {
         </div>
 
         {/* The 8 Icons - Now gracefully arranged in a sleek horizontal menu bar below the hero */}
-        <div className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="min-w-max px-8 py-4 md:py-6 flex flex-row justify-center items-center gap-6 md:gap-8 lg:gap-12 mx-auto">
-            {constItems.map((item, i) => (
+        <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="relative min-w-max px-6 py-4 md:py-6 flex flex-row justify-start md:justify-center items-start gap-8 md:gap-8 lg:gap-12 mx-auto">
+            {[...constItems, ...constItems].map((item, i) => (
               <a 
                 href="#services"
                 key={i} 
-                className="flex flex-col items-center flex-shrink-0 group cursor-pointer pointer-events-auto"
+                className={`flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-pointer pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
               >
                 <div 
                   className="w-12 h-12 bg-blue-900 rounded-full shadow-lg border-2 border-white flex items-center justify-center text-blue-100 group-hover:bg-blue-500 group-hover:scale-110 group-hover:text-white transition-all duration-300"
-                  style={{ viewTransitionName: `circle-const-${i}` }}
+                  style={{ viewTransitionName: i >= constItems.length ? 'none' : `circle-const-${i}` }}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">
                     {item.icon}
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-white mt-3 uppercase tracking-wider opacity-80 group-hover:opacity-100 transition-colors whitespace-nowrap drop-shadow-md">{item.label}</span>
+                <span className="text-[11px] font-bold text-white mt-3 uppercase tracking-wider opacity-80 group-hover:opacity-100 transition-colors text-center max-w-full drop-shadow-md">{item.label}</span>
               </a>
             ))}
           </div>

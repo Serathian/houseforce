@@ -9,11 +9,12 @@ interface Props {
   expandedSide: 'left' | 'right' | null;
   setExpandedSide: (side: 'left' | 'right' | null) => void;
   swipeTransition: object;
-  leftInset: string;
-  rightInset: string;
+  clipStrLeft: string;
+  clipStrRight: string;
+  isMobile: boolean;
 }
 
-export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTransition, leftInset, rightInset }: Props) {
+export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTransition, clipStrLeft, clipStrRight, isMobile }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, text: '', side: 'left' });
   const totalIcons = 8;
@@ -68,16 +69,29 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
   };
 
   const getExpandedPosition = (index: number, side: 'left' | 'right') => {
-    const col = index % 2; 
-    const row = Math.floor(index / 2); 
-    
-    let x = 100 + (col * 280); 
-    if (side === 'right') {
-       x = -620 + (col * 280);
+    if (isMobile) {
+      // 2 columns, 4 rows to give text labels plenty of breathing room horizontally
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      
+      // Horizontal spacing: 140px gap (-70 and +70 from center)
+      const x = -70 + (col * 140);
+      
+      // Vertical spacing: 95px gap for text below icon
+      // Construction text is Top, so icons go to Bottom (positive Y)
+      // Keyholding text is Bottom, so icons go to Top (negative Y)
+      const y = side === 'left' ? -70 + (row * 95) : -230 + (row * 95);
+      return { x, y };
+    } else {
+      const col = index % 2; 
+      const row = Math.floor(index / 2); 
+      let x = 100 + (col * 280); 
+      if (side === 'right') {
+         x = -620 + (col * 280);
+      }
+      const y = -220 + (row * 150); 
+      return { x, y };
     }
-
-    const y = -220 + (row * 150); 
-    return { x, y };
   };
 
   return (
@@ -98,7 +112,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
         <motion.div 
           className="absolute inset-0 w-full h-full z-10"
           initial={false}
-          animate={{ clipPath: `inset(0px ${leftInset} 0px 0px)` }}
+          animate={{ clipPath: clipStrLeft }}
           transition={swipeTransition}
         >
           <div className="absolute inset-0 w-full h-full">
@@ -160,10 +174,10 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, transition: { duration: 0.2 } }}
                           transition={{ delay: swipeTransition.duration + 0.5 + (i % 2) * 0.1 }}
-                          className="absolute top-1/2 -translate-y-1/2 w-48 text-left left-[130%]"
+                          className={`absolute w-48 ${isMobile ? 'top-[130%] left-1/2 -translate-x-1/2 text-center' : 'top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
                         >
                           <h3 className="font-bold text-white text-sm whitespace-nowrap drop-shadow-sm">{item.label}</h3>
-                          <p className="text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm">{item.desc}</p>
+                          <p className={`text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm ${isMobile ? 'hidden' : 'block'}`}>{item.desc}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -179,7 +193,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
         <motion.div 
           className="absolute inset-0 w-full h-full z-10"
           initial={false}
-          animate={{ clipPath: `inset(0px 0px 0px ${rightInset})` }}
+          animate={{ clipPath: clipStrRight }}
           transition={swipeTransition}
         >
           <div className="absolute inset-0 w-full h-full">
@@ -240,10 +254,10 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, transition: { duration: 0.2 } }}
                           transition={{ delay: swipeTransition.duration + 0.5 + (i % 2) * 0.1 }}
-                          className="absolute top-1/2 -translate-y-1/2 w-48 text-left left-[130%]"
+                          className={`absolute w-48 ${isMobile ? 'top-[130%] left-1/2 -translate-x-1/2 text-center' : 'top-1/2 -translate-y-1/2 text-left left-[130%]'}`}
                         >
                           <h3 className="font-bold text-white text-sm whitespace-nowrap drop-shadow-sm">{item.label}</h3>
-                          <p className="text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm">{item.desc}</p>
+                          <p className={`text-white/80 text-xs mt-0.5 leading-tight drop-shadow-sm ${isMobile ? 'hidden' : 'block'}`}>{item.desc}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>

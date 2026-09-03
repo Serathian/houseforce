@@ -32,6 +32,9 @@ export default function RootLayout({
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
+        <head>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=mouse,swipe_up" />
+        </head>
         <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
           <Header />
           <main className="flex-grow">{children}</main>
