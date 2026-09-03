@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
-import { 
-  Hammer, Wrench, HardHat, Paintbrush, Ruler, Pickaxe, Settings, Brush,
-  Key, Lock, House, Umbrella, Sun, Droplets, SprayCan, Sparkles
-} from 'lucide-react';
+import { constItems, keyItems } from '@/data/services';
 
 interface Props {
   expandedSide: 'left' | 'right' | null;
   setExpandedSide: (side: 'left' | 'right' | null) => void;
-  swipeTransition: any;
+  swipeTransition: object;
+  leftInset: string;
+  rightInset: string;
 }
 
-export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTransition }: Props) {
+export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTransition, leftInset, rightInset }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, text: '', side: 'left' });
   const totalIcons = 8;
@@ -39,28 +38,6 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
     renderLoop();
     return () => cancelAnimationFrame(animationFrameId);
   }, [isHovered, expandedSide, rotateMV, counterRotateMV]);
-
-  const constItems = [
-    { icon: <Hammer />, label: "General Building", desc: "Expert brickwork, extensions, and structural changes.", href: "/services/construction" },
-    { icon: <Wrench />, label: "Plumbing & Electrics", desc: "Certified installations and complete system rewires.", href: "/services/construction" },
-    { icon: <HardHat />, label: "Project Management", desc: "Full end-to-end oversight of your renovation.", href: "/services/construction" },
-    { icon: <Paintbrush />, label: "Painting & Decorating", desc: "Premium interior and exterior finishes.", href: "/services/construction" },
-    { icon: <Ruler />, label: "Planning", desc: "Architectural drawings and local permissions.", href: "/services/construction" },
-    { icon: <Pickaxe />, label: "Renovations", desc: "Complete property modernisation.", href: "/services/construction" },
-    { icon: <Settings />, label: "Custom Fitting", desc: "Bespoke kitchens, bathrooms, and carpentry.", href: "/services/construction" },
-    { icon: <Brush />, label: "Plastering", desc: "Smooth finishes and exterior rendering.", href: "/services/construction" }
-  ];
-
-  const keyItems = [
-    { icon: <Key />, label: "Meet & Greet", desc: "Personal check-ins for your holiday guests.", href: "/services/keyholding" },
-    { icon: <SprayCan />, label: "Deep Cleaning", desc: "Thorough sanitisation between visits.", href: "/services/keyholding" },
-    { icon: <House />, label: "Property Inspections", desc: "Regular checks for leaks, pests, or damage.", href: "/services/keyholding" },
-    { icon: <Umbrella />, label: "Holiday Home Care", desc: "Complete management of your rental.", href: "/services/keyholding" },
-    { icon: <Droplets />, label: "Plumbing Flushes", desc: "Preventing stagnant water and pipe issues.", href: "/services/keyholding" },
-    { icon: <Lock />, label: "Security Checks", desc: "Ensuring doors, windows, and alarms are secure.", href: "/services/keyholding" },
-    { icon: <Sparkles />, label: "Changeover Cleans", desc: "Fast, spotless turnaround for new guests.", href: "/services/keyholding" },
-    { icon: <Sun />, label: "Worry-Free Vacations", desc: "24/7 local emergency contact for peace of mind.", href: "/services/keyholding" }
-  ];
 
   const handleMouseEnter = (e: React.MouseEvent, text: string, side: 'left' | 'right') => {
     if (expandedSide) return;
@@ -96,7 +73,6 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
     
     let x = 100 + (col * 280); 
     if (side === 'right') {
-       // Shift coordinates further left because the text will render to the right of the icon
        x = -620 + (col * 280);
     }
 
@@ -120,17 +96,16 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
 
         {/* Left Half Wrapper (Construction) */}
         <motion.div 
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full z-10"
           initial={false}
-          animate={{ 
-            clipPath: expandedSide === 'left' ? 'inset(0% 0% 0% 0%)' : expandedSide === 'right' ? 'inset(0% 100% 0% 0%)' : 'inset(0% 50% 0% 0%)'
-          }}
+          animate={{ clipPath: `inset(0px ${leftInset} 0px 0px)` }}
           transition={swipeTransition}
         >
-          <motion.div 
-            className={`absolute left-1/2 top-1/2 w-0 h-0`}
-            style={{ rotate: rotateMV }}
-          >
+          <div className="absolute inset-0 w-full h-full">
+            <motion.div 
+              className={`absolute left-1/2 top-1/2 w-0 h-0`}
+              style={{ rotate: rotateMV }}
+            >
             {/* The circular border */}
             <motion.div 
               className="absolute left-0 top-0 rounded-full border border-blue-400/30 -ml-[110px] -mt-[110px]"
@@ -170,6 +145,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                     <motion.div 
                       className="w-full h-full bg-blue-900 rounded-full shadow-lg border-2 border-white flex flex-col items-center justify-center text-blue-100 transition-colors duration-300 hover:bg-blue-600 hover:text-white"
                       whileHover={{ scale: isExpanded ? 1.05 : 1.15 }}
+                      style={{ viewTransitionName: isExpanded ? `circle-const-${i}` : 'none' }}
                     >
                       <motion.div className="w-5 h-5 flex items-center justify-center" style={{ rotate: counterRotateMV }}>
                         {item.icon}
@@ -196,21 +172,21 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
               );
             })}
           </motion.div>
+          </div>
         </motion.div>
 
         {/* Right Half Wrapper (Keyholding) */}
         <motion.div 
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full z-10"
           initial={false}
-          animate={{ 
-            clipPath: expandedSide === 'right' ? 'inset(0% 0% 0% 0%)' : expandedSide === 'left' ? 'inset(0% 0% 0% 100%)' : 'inset(0% 0% 0% 50%)'
-          }}
+          animate={{ clipPath: `inset(0px 0px 0px ${rightInset})` }}
           transition={swipeTransition}
         >
-          <motion.div 
-            className={`absolute left-1/2 top-1/2 w-0 h-0`}
-            style={{ rotate: rotateMV }}
-          >
+          <div className="absolute inset-0 w-full h-full">
+            <motion.div 
+              className={`absolute left-1/2 top-1/2 w-0 h-0`}
+              style={{ rotate: rotateMV }}
+            >
             <motion.div 
               className="absolute left-0 top-0 rounded-full border border-teal-400/30 -ml-[110px] -mt-[110px]"
               style={{ width: radius*2, height: radius*2 }}
@@ -249,6 +225,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
                     <motion.div 
                       className="w-full h-full bg-teal-800 rounded-full shadow-xl border-2 border-white flex flex-col items-center justify-center text-teal-100 transition-colors duration-300 hover:bg-teal-500 hover:text-white"
                       whileHover={{ scale: isExpanded ? 1.05 : 1.15 }}
+                      style={{ viewTransitionName: isExpanded ? `circle-key-${i}` : 'none' }}
                     >
                       <motion.div className="w-5 h-5 flex items-center justify-center" style={{ rotate: counterRotateMV }}>
                         {item.icon}
@@ -275,6 +252,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
               );
             })}
           </motion.div>
+          </div>
         </motion.div>
 
       </div>

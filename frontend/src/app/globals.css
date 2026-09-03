@@ -19,3 +19,11 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+@view-transition { navigation: auto; }
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.8s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

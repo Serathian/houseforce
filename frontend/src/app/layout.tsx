@@ -19,21 +19,25 @@ export const metadata: Metadata = {
   description: "Family run property reforming and keyholding services in Torrevieja, Spain.",
 };
 
+import { ViewTransitions } from 'next-view-transitions';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
-        <Header />
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </body>
-    </html>
+    <ViewTransitions>
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      >
+        <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

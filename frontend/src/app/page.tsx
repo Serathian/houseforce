@@ -1,110 +1,196 @@
 "use client";
 
 import React, { useState } from 'react';
+import { Link } from 'next-view-transitions';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import SpinningWheel from '@/components/SpinningWheel';
 
 export default function Home() {
   const [expandedSide, setExpandedSide] = useState<'left' | 'right' | null>(null);
+  const [hoveredEdge, setHoveredEdge] = useState<'left' | 'right' | null>(null);
 
-  const handleReset = () => setExpandedSide(null);
+  const handleReset = () => {
+    setExpandedSide(null);
+    setHoveredEdge(false);
+  };
 
-  // Transition settings to perfectly sync background swipe with wheel reveal
-  const swipeTransition = { duration: 1.0, ease: [0.16, 1, 0.3, 1] };
+  const swipeTransition = { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const };
+
+
+
+  let rightInset = 'calc(50% + 0px)';
+  let leftInset = 'calc(50% + 0px)';
+
+  if (expandedSide === 'left') {
+    leftInset = hoveredEdge === 'right' ? 'calc(0% + 260px)' : 'calc(0% + 48px)';
+    rightInset = hoveredEdge === 'right' ? 'calc(100% - 260px)' : 'calc(100% - 48px)';
+  } else if (expandedSide === 'right') {
+    leftInset = hoveredEdge === 'left' ? 'calc(100% - 260px)' : 'calc(100% - 48px)';
+    rightInset = hoveredEdge === 'left' ? 'calc(0% + 260px)' : 'calc(0% + 48px)';
+  }
 
   return (
-    <div className="flex flex-col items-center bg-slate-50 min-h-screen overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       
-      {/* Absolute Background Swipe Layers */}
-      <div className="absolute inset-0 w-full h-[85vh] z-0 overflow-hidden pointer-events-none">
+      {/* Dynamic Spatial Hero */}
+      <section className="relative w-full h-[85vh] overflow-hidden bg-slate-50">
+        
         {/* Left Background (Construction - Blue) */}
         <motion.div 
-          className="absolute left-0 top-0 h-full overflow-hidden"
+          className="absolute inset-0 w-full h-full group"
           initial={false}
-          animate={{ 
-            width: expandedSide === 'left' ? '100%' : expandedSide === 'right' ? '0%' : '50%' 
-          }}
+          animate={{ clipPath: `inset(0px ${leftInset} 0px 0px)` }}
           transition={swipeTransition}
+          onClick={() => expandedSide === 'right' && handleReset()}
+          onMouseEnter={() => expandedSide === 'right' && setHoveredEdge('left')}
+          onMouseLeave={() => expandedSide === 'right' && setHoveredEdge(null)}
         >
-          {/* Ensure the image itself doesn't shrink, just the container masking it */}
-          <div className="absolute left-0 top-0 w-[100vw] h-full bg-blue-900 opacity-95"></div>
-          <div className="absolute left-0 top-0 w-[100vw] h-full bg-[url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2942&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+          <div className="absolute inset-0 w-full h-full bg-blue-900 opacity-95"></div>
+          <div className="absolute inset-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2942&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+          
+          {/* Peeking Drawer Handle */}
+          <AnimatePresence>
+            {expandedSide === 'right' && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 1.0, duration: 0.3 }}
+                className="absolute right-0 top-0 h-full w-full cursor-pointer group/sliver z-50 pointer-events-auto"
+                onClick={() => handleReset()}
+              >
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center pl-3 w-[260px] opacity-70 group-hover/sliver:opacity-100 transition-opacity duration-300">
+                  <ArrowRight className="shrink-0 text-white w-6 h-6 group-hover/sliver:translate-x-1 transition-transform duration-300 drop-shadow-md" />
+                  <span className="ml-4 font-bold text-white text-lg tracking-wide whitespace-nowrap drop-shadow-md">Back to Selection</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Right Background (Keyholding - Teal) */}
         <motion.div 
-          className="absolute right-0 top-0 h-full overflow-hidden"
+          className="absolute inset-0 w-full h-full group"
           initial={false}
-          animate={{ 
-            width: expandedSide === 'right' ? '100%' : expandedSide === 'left' ? '0%' : '50%' 
-          }}
+          animate={{ clipPath: `inset(0px 0px 0px ${rightInset})` }}
           transition={swipeTransition}
+          onClick={() => expandedSide === 'left' && handleReset()}
+          onMouseEnter={() => expandedSide === 'left' && setHoveredEdge('right')}
+          onMouseLeave={() => expandedSide === 'left' && setHoveredEdge(null)}
         >
-          {/* We lock the image to the right so it stays stable while swiping left */}
-          <div className="absolute right-0 top-0 w-[100vw] h-full bg-teal-800 opacity-95"></div>
-          <div className="absolute right-0 top-0 w-[100vw] h-full bg-[url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+          <div className="absolute inset-0 w-full h-full bg-teal-800 opacity-95"></div>
+          <div className="absolute inset-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+
+          {/* Peeking Drawer Handle */}
+          <AnimatePresence>
+            {expandedSide === 'left' && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 1.0, duration: 0.3 }}
+                className="absolute left-0 top-0 h-full w-full cursor-pointer group/sliver z-50 pointer-events-auto"
+                onClick={() => handleReset()}
+              >
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center pr-3 justify-end w-[260px] opacity-70 group-hover/sliver:opacity-100 transition-opacity duration-300">
+                  <span className="mr-4 font-bold text-white text-lg tracking-wide whitespace-nowrap drop-shadow-md">Back to Selection</span>
+                  <ArrowLeft className="shrink-0 text-white w-6 h-6 group-hover/sliver:-translate-x-1 transition-transform duration-300 drop-shadow-md" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
-      </div>
 
-      {/* Back Button */}
-      <AnimatePresence>
-        {expandedSide && (
-          <motion.button 
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            transition={{ duration: 0.5, delay: 1.5 }}
-            onClick={handleReset}
-            className="fixed top-24 left-8 z-50 bg-white text-slate-900 font-bold py-3 px-8 rounded-full shadow-2xl border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer"
-          >
-            &larr; Back to Overview
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      <section className="relative w-full flex flex-row min-h-[85vh] z-10 pointer-events-none">
+        {/* The Wheel */}
+        <SpinningWheel 
+          expandedSide={expandedSide} 
+          setExpandedSide={setExpandedSide}
+          swipeTransition={swipeTransition}
+          leftInset={leftInset}
+          rightInset={rightInset}
+        />
         
-        {/* The Interactive Wheel Component */}
-        <SpinningWheel expandedSide={expandedSide} setExpandedSide={setExpandedSide} swipeTransition={swipeTransition} />
-        
-        {/* Left Content Container (Static 50% width so text never moves!) */}
-        <div className="w-1/2 flex flex-col items-center p-12 text-center mt-16 pointer-events-none">
-          <AnimatePresence>
-            {(expandedSide === null || expandedSide === 'left') && (
-              <motion.div 
-                className="relative z-20 flex flex-col items-center"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, transition: { duration: 0.3 } }}
-              >
-                <span className="text-blue-300 font-semibold tracking-wider uppercase text-sm mb-4">Led by Paul Reddy</span>
-                <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
-                <p className="text-lg text-blue-100 mb-8 max-w-sm font-light drop-shadow">
-                  30+ years of expertise. "Quality First" property renovations in Torrevieja.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <div className="absolute inset-0 w-full h-full flex flex-row pointer-events-none z-10">
+          {/* Left Content Container */}
+          <div className="w-1/2 flex flex-col items-center justify-center p-12 text-center h-full">
+            <AnimatePresence>
+              {(expandedSide === null || expandedSide === 'left') && (
+                <motion.div 
+                  className="relative z-20 flex flex-col items-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                  style={{ viewTransitionName: expandedSide === 'left' ? 'hero-text-const' : 'none' }}
+                >
+                  <span className="text-blue-300 font-semibold tracking-wider uppercase text-sm mb-4">Led by Paul Reddy</span>
+                  <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
+                  <p className="text-lg text-blue-100 mb-8 max-w-sm font-light drop-shadow">
+                    30+ years of expertise. &quot;Quality First&quot; property renovations in Torrevieja.
+                  </p>
 
-        {/* Right Content Container (Static 50% width) */}
-        <div className="w-1/2 flex flex-col items-center p-12 text-center mt-16 pointer-events-none">
-          <AnimatePresence>
-            {(expandedSide === null || expandedSide === 'right') && (
-              <motion.div 
-                className="relative z-20 flex flex-col items-center"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, transition: { duration: 0.3 } }}
-              >
-                <span className="text-teal-200 font-semibold tracking-wider uppercase text-sm mb-4">Managed by Paige</span>
-                <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white tracking-tight drop-shadow-md">Keyholding<br/>& Cleaning</h2>
-                <p className="text-lg text-teal-50 mb-8 max-w-sm font-light drop-shadow">
-                  Total peace of mind for your Spanish property with meticulous cleaning and security.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <AnimatePresence>
+                    {expandedSide === 'left' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20, transition: { duration: 0.2 } }}
+                        transition={{ delay: 1.5, duration: 0.5 }}
+                        className="pointer-events-auto"
+                      >
+                        <Link 
+                          href="/services/construction"
+                          className="inline-flex items-center bg-white text-blue-900 font-bold py-4 px-8 rounded-full shadow-xl hover:bg-blue-50 hover:scale-105 transition-all"
+                        >
+                          Explore Construction <ArrowRight className="ml-2 w-5 h-5" />
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Right Content Container */}
+          <div className="w-1/2 flex flex-col items-center justify-center p-12 text-center h-full">
+            <AnimatePresence>
+              {(expandedSide === null || expandedSide === 'right') && (
+                <motion.div 
+                  className="relative z-20 flex flex-col items-center"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                  style={{ viewTransitionName: expandedSide === 'right' ? 'hero-text-key' : 'none' }}
+                >
+                  <span className="text-teal-200 font-semibold tracking-wider uppercase text-sm mb-4">Managed by Paige</span>
+                  <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white tracking-tight drop-shadow-md">Keyholding<br/>& Cleaning</h2>
+                  <p className="text-lg text-teal-50 mb-8 max-w-sm font-light drop-shadow">
+                    Total peace of mind for your Spanish property with meticulous cleaning and security.
+                  </p>
+
+                  <AnimatePresence>
+                    {expandedSide === 'right' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20, transition: { duration: 0.2 } }}
+                        transition={{ delay: 1.5, duration: 0.5 }}
+                        className="pointer-events-auto"
+                      >
+                        <Link 
+                          href="/services/keyholding"
+                          className="inline-flex items-center bg-white text-teal-900 font-bold py-4 px-8 rounded-full shadow-xl hover:bg-teal-50 hover:scale-105 transition-all"
+                        >
+                          Explore Keyholding <ArrowRight className="ml-2 w-5 h-5" />
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 
