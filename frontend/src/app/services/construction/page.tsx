@@ -162,22 +162,22 @@ export default function ConstructionPage() {
 
         {/* The 8 Icons - Now gracefully arranged in a sleek horizontal menu bar below the hero */}
         <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="relative min-w-max px-6 py-4 md:py-6 flex flex-row justify-start md:justify-center items-start gap-8 md:gap-8 lg:gap-12 mx-auto">
+          <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start md:justify-center items-center gap-6 md:gap-10 lg:gap-12 mx-auto">
             {[...constItems, ...constItems].map((item, i) => (
               <a 
                 href="#services"
                 key={i} 
-                className={`flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-pointer pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
+                className={`flex flex-row items-center gap-3 pr-2 flex-shrink-0 group cursor-pointer pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
               >
+                <span className="text-[11px] md:text-xs font-bold text-white uppercase tracking-wider opacity-80 group-hover:opacity-100 transition-colors whitespace-nowrap drop-shadow-md">{item.label}</span>
                 <div 
-                  className="w-12 h-12 bg-blue-900 rounded-full shadow-lg border-2 border-white flex items-center justify-center text-blue-100 group-hover:bg-blue-500 group-hover:scale-110 group-hover:text-white transition-all duration-300"
+                  className="w-10 h-10 md:w-12 md:h-12 bg-blue-900 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-blue-100 group-hover:bg-blue-500 group-hover:scale-110 group-hover:text-white transition-all duration-300"
                   style={{ viewTransitionName: i >= constItems.length ? 'none' : `circle-const-${i}` }}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">
                     {item.icon}
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-white mt-3 uppercase tracking-wider opacity-80 group-hover:opacity-100 transition-colors text-center max-w-full drop-shadow-md">{item.label}</span>
               </a>
             ))}
           </div>

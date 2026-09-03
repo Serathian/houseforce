@@ -153,7 +153,7 @@ export default function KeyholdingPage() {
 
         {/* The 8 Icons - Now gracefully arranged in a sleek horizontal menu bar below the hero */}
         <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="relative min-w-max px-6 py-4 md:py-6 flex flex-row justify-start md:justify-center items-start gap-8 md:gap-8 lg:gap-12 mx-auto">
+          <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start md:justify-center items-center gap-6 md:gap-10 lg:gap-12 mx-auto">
             {[...keyItems, ...keyItems].map((item, i) => (
               <a 
                 href="#services"
