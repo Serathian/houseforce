@@ -243,7 +243,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-900 font-bold text-xs uppercase tracking-widest mb-4">
             <Award className="w-4 h-4 text-blue-700" />
-            20+ Years Operating in Torrevieja &amp; Costa Blanca
+            20+ Years Operating in Torrevieja, La Mata &amp; Costa Blanca
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
             Changing How You Think About <br className="hidden sm:inline" />
@@ -253,95 +253,131 @@ export default function Home() {
             For over two decades, <strong>HouseForce.biz</strong> has delivered a fully legal, transparent, family-run alternative to traditional general contractors. With direct family oversight on every single job, we treat your home with the care and standards it deserves.
           </p>
 
-          {/* Family Team Spotlight Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          {/* Modern People-First Team Showcase - Quick Intro */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left mb-10">
             {/* Paul Card */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-blue-900 text-white font-extrabold text-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    PR
+                <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                  <img 
+                    src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop" 
+                    alt="Paul Reddy - Founder & Master Contractor"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                  <div className="absolute bottom-3 left-4 right-4 text-white">
+                    <h3 className="text-xl font-extrabold tracking-tight">Paul Reddy</h3>
+                    <p className="text-blue-300 font-bold text-[11px] uppercase tracking-wider">Founder &amp; Master Contractor</p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 bg-blue-100 text-blue-900 rounded-full">
-                    🇬🇧 35+ Yrs Trade Exp.
-                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-1">Paul Reddy</h3>
-                <p className="text-blue-800 font-bold text-sm uppercase tracking-wide mb-4">Founder &amp; Master Contractor</p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 font-light">
-                  Directly managing all major structural reforms, villa extensions, kitchens, bathrooms, and technical building works. Uncompromising &quot;Quality First&quot; standards.
-                </p>
+                <div className="p-5">
+                  <p className="text-slate-600 text-xs leading-relaxed font-light">
+                    Over 35 years in the building trades, supervising all reforms in Torrevieja directly.
+                  </p>
+                </div>
               </div>
-              <Link 
-                href="/contact?dept=construction"
-                className="inline-flex items-center justify-between w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-5 rounded-2xl transition-colors text-sm shadow-md"
-              >
-                <span>Consult with Paul</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+              <div className="px-5 pb-5 pt-3 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                <a href="mailto:paul@houseforce.biz" className="text-blue-900 font-bold hover:underline">paul@houseforce.biz</a>
+              </div>
             </div>
 
             {/* Paige Card */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-teal-800 text-white font-extrabold text-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    PA
+                <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                  <img 
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop" 
+                    alt="Paige Reddy - Keyholding Lead"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                  <div className="absolute bottom-3 left-4 right-4 text-white">
+                    <h3 className="text-xl font-extrabold tracking-tight">Paige Reddy</h3>
+                    <p className="text-teal-300 font-bold text-[11px] uppercase tracking-wider">Property Care Manager</p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 bg-teal-100 text-teal-900 rounded-full">
-                    🇬🇧 🇪🇸 Keyholding Lead
-                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-1">Paige Reddy</h3>
-                <p className="text-teal-800 font-bold text-sm uppercase tracking-wide mb-4">Property Care &amp; Keyholding Manager</p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 font-light">
-                  Heading up our dedicated keyholding, changeover cleans, emergency callouts, and property security inspections with complete honesty and reliability.
-                </p>
+                <div className="p-5">
+                  <p className="text-slate-600 text-xs leading-relaxed font-light">
+                    Managing keyholding custody, bi-weekly checks, and turnover cleaning for expat homes.
+                  </p>
+                </div>
               </div>
-              <Link 
-                href="/contact?dept=keyholding"
-                className="inline-flex items-center justify-between w-full bg-teal-800 hover:bg-teal-700 text-white font-bold py-3 px-5 rounded-2xl transition-colors text-sm shadow-md"
-              >
-                <span>Connect with Paige</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+              <div className="px-5 pb-5 pt-3 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                <a href="mailto:paige@houseforce.biz" className="text-teal-900 font-bold hover:underline">paige@houseforce.biz</a>
+              </div>
             </div>
 
             {/* Skippy Card */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-800 text-white font-extrabold text-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    SK
+                <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                  <img 
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" 
+                    alt="Gabriel Skippy - Operations Manager"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                  <div className="absolute bottom-3 left-4 right-4 text-white">
+                    <h3 className="text-xl font-extrabold tracking-tight">Gabriel &quot;Skippy&quot;</h3>
+                    <p className="text-slate-300 font-bold text-[11px] uppercase tracking-wider">Operations &amp; Local Liaison</p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 bg-slate-200 text-slate-800 rounded-full">
-                    🇬🇧 🇪🇸 20+ Yrs Local
-                  </span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-1">Gabriel &quot;Skippy&quot;</h3>
-                <p className="text-slate-700 font-bold text-sm uppercase tracking-wide mb-4">Operations &amp; Local Liaison</p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 font-light">
-                  Bilingual client liaison and site operations coordinator. Ensuring smooth communication between homeowners, suppliers, and municipal permissions.
-                </p>
+                <div className="p-5">
+                  <p className="text-slate-600 text-xs leading-relaxed font-light">
+                    Bilingual liaison coordinating site operations, suppliers, and town hall permits.
+                  </p>
+                </div>
               </div>
-              <Link 
-                href="/about"
-                className="inline-flex items-center justify-between w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-2xl transition-colors text-sm shadow-md"
-              >
-                <span>Meet the Full Team</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+              <div className="px-5 pb-5 pt-3 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                <span className="text-slate-900 font-bold">English &amp; Spanish</span>
+              </div>
             </div>
+
+            {/* Jake Card */}
+            <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden flex flex-col justify-between group">
+              <div>
+                <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                  <img 
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" 
+                    alt="Jake Reddy - Head of Digital Systems"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                  <div className="absolute bottom-3 left-4 right-4 text-white">
+                    <h3 className="text-xl font-extrabold tracking-tight">Jake Reddy</h3>
+                    <p className="text-indigo-300 font-bold text-[11px] uppercase tracking-wider">Digital Systems &amp; Web</p>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-slate-600 text-xs leading-relaxed font-light">
+                    Maintaining website infrastructure, quote forms, and owner digital communications.
+                  </p>
+                </div>
+              </div>
+              <div className="px-5 pb-5 pt-3 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                <span className="text-indigo-900 font-bold">Web &amp; Systems</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-8 rounded-full text-sm transition-colors shadow-md"
+            >
+              <span>Learn Our 20-Year Story &amp; Working Standards</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Dual Core Pillars & Direct CTAs */}
+      {/* Two Core Family Services */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-slate-100/70 border-b border-slate-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-              Two Specialized Divisions, One Dedicated Family
+              Two Core Services, One Family Team
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto font-light">
               Choose the service tailored to your property needs—or combine both for total property peace of mind in Torrevieja.
@@ -350,99 +386,97 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {/* Construction & Reforming Card */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-lg relative overflow-hidden flex flex-col justify-between">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="bg-white rounded-2xl p-8 sm:p-10 border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] hover:border-blue-200 transition-all duration-300 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-blue-900 text-white rounded-2xl shadow-md">
-                    <Hammer className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-blue-950 text-white rounded-xl shadow-sm">
+                      <Hammer className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-blue-900 text-xs font-bold uppercase tracking-wider">Led by Paul &amp; Skippy</span>
+                      <h3 className="text-2xl font-extrabold text-slate-900">Construction &amp; Reforming</h3>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-blue-900 text-xs font-bold uppercase tracking-wider">Division 01</span>
-                    <h3 className="text-2xl font-bold text-slate-900">Construction &amp; Reforming</h3>
-                  </div>
+                  <span className="hidden sm:inline-block text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-3 py-1 rounded-md">
+                    Torrevieja &amp; Region
+                  </span>
                 </div>
 
                 <p className="text-slate-600 mb-6 font-light leading-relaxed">
-                  From complete villa refurbishments and modern kitchen installations to bathroom rewires, plastering, and structural alterations.
+                  Specialists in Costa Blanca property reforms—from full villa modernisations and custom kitchen fittings to bathroom rewires and municipal planning.
                 </p>
 
                 <ul className="space-y-3 mb-8">
                   {[
-                    "Full Property Modernisation & Villa Extensions",
-                    "Custom Kitchens, Bathrooms & Tiling",
-                    "Licensed Plumbing, Electrical & Structural Works",
+                    "Full Villa Modernisations & Coastal Extensions",
+                    "Custom Kitchens, Bathrooms & Moisture-Resistant Tiling",
+                    "Certified Plumbing, Electrical Rewires & Structural Works",
                     "Itemized, Guaranteed Quotes with Zero Hidden Fees"
                   ].map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-slate-700 text-sm font-medium">
-                      <CheckCircle2 className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-blue-900 shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/contact?dept=construction"
-                  className="flex-1 inline-flex justify-center items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md text-sm hover:scale-[1.02]"
-                >
-                  <Send className="w-4 h-4" /> Get Free Reform Quote
-                </Link>
+              <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
                 <Link
                   href="/services/construction"
-                  className="inline-flex justify-center items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold py-3.5 px-6 rounded-2xl transition-colors text-sm"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-blue-800 transition-colors group"
                 >
-                  Explore Services <ArrowRight className="w-4 h-4" />
+                  <span>Explore Construction &amp; Reform Services</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
 
             {/* Keyholding & Property Care Card */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-lg relative overflow-hidden flex flex-col justify-between">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="bg-white rounded-2xl p-8 sm:p-10 border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.08)] hover:border-teal-200 transition-all duration-300 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-teal-800 text-white rounded-2xl shadow-md">
-                    <Key className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-teal-900 text-white rounded-xl shadow-sm">
+                      <Key className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-teal-800 text-xs font-bold uppercase tracking-wider">Managed by Paige</span>
+                      <h3 className="text-2xl font-extrabold text-slate-900">Keyholding &amp; Property Care</h3>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-teal-800 text-xs font-bold uppercase tracking-wider">Division 02</span>
-                    <h3 className="text-2xl font-bold text-slate-900">Keyholding &amp; Property Care</h3>
-                  </div>
+                  <span className="hidden sm:inline-block text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-3 py-1 rounded-md">
+                    Torrevieja &amp; Region
+                  </span>
                 </div>
 
                 <p className="text-slate-600 mb-6 font-light leading-relaxed">
-                  Protect your investment while away with meticulous key security, regular property inspections, deep changeover cleans, and emergency assistance.
+                  Protecting your overseas home while away with secure key storage, summer pipe flushes, storm checks, changeover cleans, and emergency response.
                 </p>
 
                 <ul className="space-y-3 mb-8">
                   {[
                     "Secure Key Storage & 24/7 Local Emergency Contact",
-                    "Routine Property Inspections, Flushing & Security Checks",
+                    "Routine Property Inspections, Plumbing Flushes & Security Checks",
                     "Spotless Holiday Changeover & Deep Cleaning Services",
                     "Personal Guest Meet & Greet Handovers"
                   ].map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-slate-700 text-sm font-medium">
-                      <CheckCircle2 className="w-5 h-5 text-teal-700 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-teal-800 shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/contact?dept=keyholding"
-                  className="flex-1 inline-flex justify-center items-center gap-2 bg-teal-800 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md text-sm hover:scale-[1.02]"
-                >
-                  <Send className="w-4 h-4" /> Book Keyholding Plan
-                </Link>
+              <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
                 <Link
                   href="/services/keyholding"
-                  className="inline-flex justify-center items-center gap-2 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold py-3.5 px-6 rounded-2xl transition-colors text-sm"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-teal-950 hover:text-teal-800 transition-colors group"
                 >
-                  Explore Services <ArrowRight className="w-4 h-4" />
+                  <span>Explore Keyholding &amp; Cleaning Plans</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
@@ -450,11 +484,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Choose HouseForce - Quality & Trust Pillars */}
+      {/* Why Choose HouseForce - Grounded Family Standards */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-slate-500 font-bold text-xs uppercase tracking-widest">Our Uncompromising Standards</span>
+            <span className="text-slate-500 font-bold text-xs uppercase tracking-widest">Our Principles</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2 mb-4 tracking-tight">
               Why Homeowners Trust HouseForce
             </h2>
@@ -464,7 +498,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-blue-300 transition-colors">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-slate-300 transition-colors">
               <div className="w-12 h-12 bg-blue-100 text-blue-900 rounded-xl flex items-center justify-center mb-4">
                 <Users className="w-6 h-6" />
               </div>
@@ -474,7 +508,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-blue-300 transition-colors">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-slate-300 transition-colors">
               <div className="w-12 h-12 bg-blue-100 text-blue-900 rounded-xl flex items-center justify-center mb-4">
                 <ShieldCheck className="w-6 h-6" />
               </div>
@@ -484,7 +518,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-teal-300 transition-colors">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-slate-300 transition-colors">
               <div className="w-12 h-12 bg-teal-100 text-teal-800 rounded-xl flex items-center justify-center mb-4">
                 <Clock className="w-6 h-6" />
               </div>
@@ -494,7 +528,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-teal-300 transition-colors">
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-slate-300 transition-colors">
               <div className="w-12 h-12 bg-teal-100 text-teal-800 rounded-xl flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6" />
               </div>
@@ -507,42 +541,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Service Process Flow */}
+      {/* Simple 3-Step Process */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-slate-900 to-teal-950/40 opacity-80 pointer-events-none"></div>
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-14">
-            <span className="text-teal-400 font-bold text-xs uppercase tracking-widest mb-2 block">Simple 3-Step Journey</span>
+            <span className="text-teal-400 font-bold text-xs uppercase tracking-widest mb-2 block">How We Work</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-              How Working With Us Works
+              Getting Started with HouseForce
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-slate-800/80 rounded-3xl p-8 border border-slate-700/60 relative">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full font-extrabold flex items-center justify-center mb-6 shadow-md">
-                1
-              </div>
-              <h3 className="text-xl font-bold mb-2">Initial Contact &amp; Consultation</h3>
+            <div className="bg-slate-800/90 rounded-2xl p-8 border border-slate-700/80 relative">
+              <span className="text-blue-400 text-xs font-bold uppercase tracking-widest mb-2 block">Step 01</span>
+              <h3 className="text-xl font-bold mb-2">Initial Contact &amp; Advice</h3>
               <p className="text-slate-300 text-sm font-light leading-relaxed">
                 Send us a message or call. We listen to your reform ideas or keyholding requirements in detail.
               </p>
             </div>
 
-            <div className="bg-slate-800/80 rounded-3xl p-8 border border-slate-700/60 relative">
-              <div className="w-10 h-10 bg-teal-600 text-white rounded-full font-extrabold flex items-center justify-center mb-6 shadow-md">
-                2
-              </div>
+            <div className="bg-slate-800/90 rounded-2xl p-8 border border-slate-700/80 relative">
+              <span className="text-teal-400 text-xs font-bold uppercase tracking-widest mb-2 block">Step 02</span>
               <h3 className="text-xl font-bold mb-2">Clear Scope &amp; Proposal</h3>
               <p className="text-slate-300 text-sm font-light leading-relaxed">
                 For reforms: Paul provides a detailed itemized quote. For keyholding: Paige tailors a property care package.
               </p>
             </div>
 
-            <div className="bg-slate-800/80 rounded-3xl p-8 border border-slate-700/60 relative">
-              <div className="w-10 h-10 bg-emerald-600 text-white rounded-full font-extrabold flex items-center justify-center mb-6 shadow-md">
-                3
-              </div>
+            <div className="bg-slate-800/90 rounded-2xl p-8 border border-slate-700/80 relative">
+              <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-2 block">Step 03</span>
               <h3 className="text-xl font-bold mb-2">Peace of Mind Delivery</h3>
               <p className="text-slate-300 text-sm font-light leading-relaxed">
                 Relax knowing your project or key security is in trusted, experienced family hands with regular updates.
@@ -553,7 +580,7 @@ export default function Home() {
           <div className="mt-12 text-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 text-white font-bold py-4 px-10 rounded-full shadow-2xl transition-all hover:scale-105 text-base"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 text-white font-bold py-4 px-10 rounded-full shadow-lg transition-all hover:scale-105 text-base"
             >
               Start Your Consultation <ArrowRight className="w-5 h-5" />
             </Link>
@@ -561,7 +588,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Customer Trust & Reviews */}
+      {/* Customer Reviews */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -574,7 +601,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md">
+            <div className="bg-white p-8 rounded-2xl border border-slate-200/90 shadow-sm">
               <div className="flex text-amber-400 gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-current" />
@@ -586,7 +613,7 @@ export default function Home() {
               <div className="font-bold text-slate-900">— Mark &amp; Sarah T., Villa Owners in Punta Prima</div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md">
+            <div className="bg-white p-8 rounded-2xl border border-slate-200/90 shadow-sm">
               <div className="flex text-amber-400 gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-current" />
@@ -601,7 +628,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* High Impact Bottom CTA Banner */}
+      {/* Bottom CTA Banner */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-950 via-slate-900 to-teal-950 text-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <span className="px-4 py-1.5 rounded-full bg-white/10 text-teal-300 font-bold text-xs uppercase tracking-widest inline-block mb-4 backdrop-blur-md">
@@ -617,7 +644,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/contact?dept=construction"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-full shadow-xl transition-all hover:scale-105 text-base"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all hover:scale-105 text-base"
             >
               <Hammer className="w-5 h-5" /> Talk to Paul (Construction)
             </Link>

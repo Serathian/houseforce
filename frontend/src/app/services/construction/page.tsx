@@ -57,32 +57,50 @@ export default function ConstructionPage() {
   const services = [
     {
       title: 'Renovations & Remodeling',
-      desc: 'From single room updates to full villa renovations. We modernize your property while respecting its original character.',
+      tag: 'Full Villa & Bungalow Reforms',
+      categorySlug: 'reforms',
+      blogCta: 'View Real Villa Reform Logs & Photos',
+      desc: 'From single room updates to complete villa transformations. We modernize your property using salt-air & damp resistant materials suitable for Spanish coastal homes.',
       icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'
     },
     {
       title: 'Kitchen Fitting',
-      desc: 'Complete kitchen overhauls including custom cabinetry, worktops, tiling, and appliance installation.',
+      tag: 'Custom Kitchen Overhauls',
+      categorySlug: 'kitchens',
+      blogCta: 'See Real Kitchen Overhauls',
+      desc: 'Complete kitchen refits including bespoke cabinetry, granite/quartz worktops, tiling, and appliance integration suited to Spanish villa layouts.',
       icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'
     },
     {
       title: 'Bathroom Installations',
-      desc: 'Transform your bathroom with modern suites, walk-in showers, flawless tiling, and waterproofing.',
+      tag: 'Walk-In Shower Conversions',
+      categorySlug: 'bathrooms',
+      blogCta: 'View Walk-In Shower Conversions',
+      desc: 'Replacing old bath suites with modern walk-in wet rooms, anti-slip tiling, waterproofing membranes, and high-efficiency plumbing.',
       icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
     },
     {
       title: 'Plumbing & Electrics',
-      desc: 'Certified and safe electrical rewiring, lighting installations, and comprehensive plumbing services.',
+      tag: 'Certified Spanish Standards',
+      categorySlug: 'plumbing',
+      blogCta: 'Read Electrical & Plumbing Notes',
+      desc: 'Full electrical rewiring, fuse box upgrades, and pipe rewiring to ensure your Torrevieja home meets current Spanish electrical & safety codes.',
       icon: 'M13 10V3L4 14h7v7l9-11h-7z'
     },
     {
       title: 'Planning & Project Management',
-      desc: 'We take the stress out of building in Spain by managing planning permissions, architects, and site coordination.',
+      tag: 'Town Hall Permits & License (Licencia de Obra)',
+      categorySlug: 'permits',
+      blogCta: 'Read Town Hall Permit Guides',
+      desc: 'Skippy handles local municipal permissions (Licencia de Obra), architect coordination, and supplier logistics so you never have to navigate Spanish paperwork alone.',
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'
     },
     {
       title: 'General Building Work',
-      desc: 'Extensions, structural modifications, plastering, and exterior finishing tailored to your exact specifications.',
+      tag: 'Extensions, Terraces & Walls',
+      categorySlug: 'building',
+      blogCta: 'See Extensions & Wall Photos',
+      desc: 'Villa extensions, perimeter boundary walls, patio rendering, roof waterproofing (tela asfáltica), and plastering built to withstand the Mediterranean climate.',
       icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
     }
   ];
@@ -187,24 +205,105 @@ export default function ConstructionPage() {
       {/* Main Content */}
       <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 mb-6">Comprehensive Building Services</h2>
+          <span className="text-blue-900 font-bold text-xs uppercase tracking-widest block mb-2">Over 20 Years in Torrevieja</span>
+          <h2 className="text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">Comprehensive Building &amp; Reform Services</h2>
           <p className="text-slate-600 text-lg leading-relaxed font-light">
-            We handle everything from the initial planning stages to the final coat of paint. With Paul personally overseeing every site alongside Skippy, you can be assured that no detail is overlooked.
+            We handle everything from initial planning permissions to the final coat of paint. With Paul personally overseeing every site alongside Skippy, you can be assured that no detail is overlooked.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-lg transition-shadow duration-300 group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={service.icon} />
-                </svg>
+          {/* 1st Feature Card - Grounded & Family-Focused (Always Full Width) */}
+          <div className="col-span-full bg-gradient-to-br from-blue-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-lg border border-blue-900/80 flex flex-col justify-between group">
+            <div className="relative z-10">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 font-bold text-xs uppercase tracking-wider">
+                  Overseen by Paul Reddy
+                </span>
+                <span className="text-xs font-medium text-slate-200 bg-white/10 px-3 py-1 rounded-full border border-white/10">
+                  {services[0].tag}
+                </span>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
-              <p className="text-slate-600 leading-relaxed font-light">{service.desc}</p>
+
+              <h3 className="text-3xl sm:text-4xl font-extrabold mb-4 tracking-tight text-white">
+                {services[0].title}
+              </h3>
+              <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-light max-w-2xl mb-8">
+                {services[0].desc}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-medium text-slate-200 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span>Turnkey Villa &amp; Bungalow Overhauls</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span>Salt-Air &amp; Damp Resistant Materials</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span>Direct On-Site Management by Paul</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span>Transparent, Itemized Written Quotes</span>
+                </div>
+              </div>
+
+              <Link 
+                href={`/blog?category=${services[0].categorySlug}`}
+                className="inline-flex items-center gap-2 text-xs font-bold text-blue-200 hover:text-white pt-4 border-t border-white/15"
+              >
+                <span>{services[0].blogCta}</span> &rarr;
+              </Link>
+            </div>
+          </div>
+
+          {/* Remaining Modern Service Cards */}
+          {services.slice(1).map((service, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.09)] hover:border-blue-300/80 transition-all duration-300 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center group-hover:bg-blue-900 group-hover:text-white transition-colors duration-300 shadow-sm border border-blue-100/60">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={service.icon} />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-950 bg-blue-50/80 px-2.5 py-1 rounded-full border border-blue-100">
+                    {service.tag}
+                  </span>
+                </div>
+                <h3 className="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">{service.title}</h3>
+                <p className="text-slate-600 leading-relaxed font-light text-sm mb-4">{service.desc}</p>
+              </div>
+
+              <Link 
+                href={`/blog?category=${service.categorySlug}`}
+                className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-950 hover:text-blue-700"
+              >
+                <span>{service.blogCta}</span>
+                <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+              </Link>
             </div>
           ))}
+        </div>
+
+        {/* Project Walkthroughs & Transparency Banner */}
+        <div className="mt-20 bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-2xl">
+            <span className="text-blue-900 font-bold text-xs uppercase tracking-widest block mb-2">Authored by Paul &amp; Skippy</span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">Proof of Quality: Read Our Project Logs</h3>
+            <p className="text-slate-600 text-base font-light leading-relaxed">
+              We document our real villa reforms, bathroom conversions, and municipal permission updates step-by-step in our blog so you can verify our standards before starting your project.
+            </p>
+          </div>
+          <Link
+            href="/blog"
+            className="shrink-0 inline-flex items-center gap-2 bg-blue-950 hover:bg-blue-850 text-white font-bold py-3.5 px-6 rounded-full text-sm transition-colors shadow-sm"
+          >
+            <span>Explore Villa Reform Logs</span> &rarr;
+          </Link>
         </div>
       </section>
     </div>
