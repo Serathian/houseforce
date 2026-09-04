@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #f8fafc; /* Slate 50 */
   --foreground: #0f172a; /* Slate 900 */

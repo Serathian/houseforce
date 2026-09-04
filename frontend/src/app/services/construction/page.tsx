@@ -1,11 +1,25 @@
 "use client";
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from 'next-view-transitions';
 import { constItems } from '@/data/services';
 
 export default function ConstructionPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isNavHovered, setIsNavHovered] = useState(false);
+
+  useEffect(() => {
+    const handleNavHover = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail === 'keyholding') {
+        setIsNavHovered(true);
+      } else {
+        setIsNavHovered(false);
+      }
+    };
+    window.addEventListener('nav-hover-sliver', handleNavHover);
+    return () => window.removeEventListener('nav-hover-sliver', handleNavHover);
+  }, []);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -105,6 +119,11 @@ export default function ConstructionPage() {
     }
   ];
 
+  const handleScrollToServices = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       
@@ -120,13 +139,13 @@ export default function ConstructionPage() {
           </div>
 
           {/* Keyholding peeking sliver! */}
-          <div className="hidden md:block absolute right-0 top-0 h-full w-[48px] hover:w-[260px] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] cursor-pointer group/sliver z-50 pointer-events-auto overflow-hidden">
+          <div className={`hidden md:block absolute right-0 top-0 h-full ${isNavHovered ? 'w-[260px]' : 'w-[48px]'} hover:w-[260px] transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] cursor-pointer group/sliver z-50 pointer-events-auto overflow-hidden`}>
             <Link href="/services/keyholding" className="block w-full h-full relative">
               <div className="absolute right-0 top-0 w-[100vw] h-full bg-teal-800 opacity-95"></div>
               <div className="absolute right-0 top-0 w-[100vw] h-full bg-[url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
               
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center pl-3 w-[260px] opacity-70 group-hover/sliver:opacity-100 transition-opacity duration-300">
-                 <svg className="w-6 h-6 text-white shrink-0 group-hover/sliver:-translate-x-1 transition-transform duration-300 drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              <div className={`absolute left-0 top-1/2 -translate-y-1/2 flex items-center pl-3 w-[260px] ${isNavHovered ? 'opacity-100' : 'opacity-70'} group-hover/sliver:opacity-100 transition-opacity duration-300`}>
+                 <svg className={`w-6 h-6 text-white shrink-0 ${isNavHovered ? '-translate-x-1' : ''} group-hover/sliver:-translate-x-1 transition-transform duration-300 drop-shadow-md`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                  <span className="ml-4 font-bold text-white text-lg tracking-wide text-center max-w-full drop-shadow-md">Explore Keyholding</span>
               </div>
             </Link>
@@ -150,9 +169,10 @@ export default function ConstructionPage() {
               transition={{ delay: 0.5, duration: 0.5 }}
               className="pointer-events-auto mt-4"
             >
-              <Link 
+              <a 
                 href="#services"
-                className="inline-flex flex-col items-center text-white/80 hover:text-white transition-colors group"
+                onClick={handleScrollToServices}
+                className="inline-flex flex-col items-center text-white/80 hover:text-white transition-colors group cursor-pointer"
               >
                 <span className="text-xs font-bold tracking-widest uppercase mb-3 drop-shadow-md">Scroll to explore</span>
                 {/* Desktop Mouse Scroll */}
@@ -173,7 +193,7 @@ export default function ConstructionPage() {
                     <span className="material-symbols-outlined text-white/80 group-hover:text-white text-4xl transition-colors">swipe_up</span>
                   </motion.div>
                 </div>
-              </Link>
+              </a>
             </motion.div>
           </motion.div>
         </div>
@@ -182,28 +202,27 @@ export default function ConstructionPage() {
         <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start md:justify-center items-center gap-6 md:gap-10 lg:gap-12 mx-auto">
             {[...constItems, ...constItems].map((item, i) => (
-              <a 
-                href="#services"
+              <div 
                 key={i} 
-                className={`flex flex-row items-center gap-3 pr-2 flex-shrink-0 group cursor-pointer pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
+                className={`flex flex-row items-center gap-3 pr-2 flex-shrink-0 group cursor-default select-none pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
               >
-                <span className="text-[11px] md:text-xs font-bold text-white uppercase tracking-wider opacity-80 group-hover:opacity-100 transition-colors whitespace-nowrap drop-shadow-md">{item.label}</span>
+                <span className="text-[11px] md:text-xs font-bold text-white uppercase tracking-wider opacity-85 transition-colors whitespace-nowrap drop-shadow-md">{item.label}</span>
                 <div 
-                  className="w-10 h-10 md:w-12 md:h-12 bg-blue-900 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-blue-100 group-hover:bg-blue-500 group-hover:scale-110 group-hover:text-white transition-all duration-300"
+                  className="w-10 h-10 md:w-12 md:h-12 bg-blue-900 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-blue-100 transition-all duration-300"
                   style={{ viewTransitionName: i >= constItems.length ? 'none' : `circle-const-${i}` }}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">
                     {item.icon}
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <span className="text-blue-900 font-bold text-xs uppercase tracking-widest block mb-2">Over 20 Years in Torrevieja</span>
           <h2 className="text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">Comprehensive Building &amp; Reform Services</h2>

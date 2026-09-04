@@ -1,12 +1,29 @@
 "use client";
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Link } from 'next-view-transitions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isConstruction = pathname === '/services/construction';
+  const isKeyholding = pathname === '/services/keyholding';
+
+  const handleNavHover = (item: 'construction' | 'keyholding' | null) => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('nav-hover-sliver', { detail: item }));
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (pathname === '/' && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('reset-homepage-hero'));
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-[100] border-b border-slate-100">
@@ -15,28 +32,55 @@ export default function Header() {
           
           {/* Logo (Left) */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-2xl font-extrabold text-blue-900 tracking-tight">
+            <Link href="/" onClick={handleLogoClick} className="text-2xl font-extrabold text-blue-900 tracking-tight">
               House<span className="text-teal-600">Force</span>
             </Link>
           </div>
           
-          {/* Primary Service Items (Dead-Centered on Screen) */}
-          <nav className="hidden md:flex items-center space-x-1.5 bg-slate-100/90 p-1.5 rounded-full border border-slate-200/80 shadow-inner absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-            <Link 
-              href="/services/construction" 
-              className="px-5 py-2 rounded-full text-xs lg:text-sm font-extrabold text-blue-950 hover:bg-white hover:text-blue-900 hover:shadow-sm transition-all flex items-center gap-2"
-            >
-              <span className="w-2 h-2 rounded-full bg-blue-900"></span>
-              <span>Construction</span>
-            </Link>
-            <Link 
-              href="/services/keyholding" 
-              className="px-5 py-2 rounded-full text-xs lg:text-sm font-extrabold text-teal-950 hover:bg-white hover:text-teal-800 hover:shadow-sm transition-all flex items-center gap-2"
-            >
-              <span className="w-2 h-2 rounded-full bg-teal-600"></span>
-              <span>Keyholding</span>
-            </Link>
-          </nav>
+          {/* Primary Service Items (Single Subtle Tab Integrated Inside Menu Bar) */}
+          <div className="hidden md:flex justify-center absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-50 pointer-events-auto">
+            <div className="relative flex items-center bg-slate-100/90 hover:bg-slate-100 p-1.5 rounded-full border border-slate-200/80 shadow-inner transition-all">
+              <nav className="flex items-center space-x-1">
+                <Link 
+                  href="/services/construction" 
+                  onMouseEnter={() => handleNavHover('construction')}
+                  onMouseLeave={() => handleNavHover(null)}
+                  className={`flex items-center gap-2 text-xs lg:text-sm font-extrabold px-4 py-1.5 rounded-full transition-all group ${
+                    isConstruction 
+                      ? 'bg-blue-900 text-white shadow-sm' 
+                      : 'text-slate-700 hover:text-blue-900'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full transition-all ${
+                    isConstruction 
+                      ? 'bg-blue-300 animate-pulse' 
+                      : 'bg-blue-900 group-hover:scale-125'
+                  }`}></span>
+                  <span>Construction</span>
+                </Link>
+
+                <div className="w-[1px] h-4 bg-slate-300/80 my-auto shrink-0" />
+
+                <Link 
+                  href="/services/keyholding" 
+                  onMouseEnter={() => handleNavHover('keyholding')}
+                  onMouseLeave={() => handleNavHover(null)}
+                  className={`flex items-center gap-2 text-xs lg:text-sm font-extrabold px-4 py-1.5 rounded-full transition-all group ${
+                    isKeyholding 
+                      ? 'bg-teal-800 text-white shadow-sm' 
+                      : 'text-slate-700 hover:text-teal-700'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full transition-all ${
+                    isKeyholding 
+                      ? 'bg-teal-200 animate-pulse' 
+                      : 'bg-teal-600 group-hover:scale-125'
+                  }`}></span>
+                  <span>Keyholding</span>
+                </Link>
+              </nav>
+            </div>
+          </div>
 
           {/* Secondary Items (Right) */}
           <div className="hidden md:flex items-center space-x-6">
