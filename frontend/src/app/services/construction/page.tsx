@@ -25,20 +25,23 @@ export default function ConstructionPage() {
     const el = scrollRef.current;
     if (!el) return;
     
-    if (window.innerWidth >= 768) return;
-    
     let animationId: number;
     let isPaused = false;
     let exactScroll = 0;
+
     const scroll = () => {
       if (!isPaused && el) {
-        exactScroll += 0.15;
+        exactScroll += 0.35;
         
-        const duplicateStart = el.children[0].children[constItems.length] as HTMLElement;
-        if (duplicateStart) {
-          const jumpPoint = duplicateStart.offsetLeft - (el.children[0].children[0] as HTMLElement).offsetLeft;
-          if (exactScroll >= jumpPoint) {
+        const firstChild = el.children[0]?.children[0] as HTMLElement;
+        const duplicateStart = el.children[0]?.children[constItems.length] as HTMLElement;
+        
+        if (firstChild && duplicateStart) {
+          const jumpPoint = duplicateStart.offsetLeft - firstChild.offsetLeft;
+          if (jumpPoint > 0 && exactScroll >= jumpPoint) {
             exactScroll -= jumpPoint;
+          } else if (exactScroll < 0) {
+            exactScroll += jumpPoint;
           }
         }
         
@@ -47,10 +50,10 @@ export default function ConstructionPage() {
       animationId = requestAnimationFrame(scroll);
     };
 
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       if (el) exactScroll = el.scrollLeft;
       animationId = requestAnimationFrame(scroll);
-    }, 1000);
+    }, 100);
 
     const pause = () => { isPaused = true; };
     const resume = () => { 
@@ -58,11 +61,16 @@ export default function ConstructionPage() {
       if (el) exactScroll = el.scrollLeft;
     };
     
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
     el.addEventListener('touchstart', pause, { passive: true });
     el.addEventListener('touchend', resume, { passive: true });
     
     return () => {
+      clearTimeout(timerId);
       cancelAnimationFrame(animationId);
+      el.removeEventListener('mouseenter', pause);
+      el.removeEventListener('mouseleave', resume);
       el.removeEventListener('touchstart', pause);
       el.removeEventListener('touchend', resume);
     };
@@ -200,21 +208,21 @@ export default function ConstructionPage() {
 
         {/* The 8 Icons - Now gracefully arranged in a sleek horizontal menu bar below the hero */}
         <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start md:justify-center items-center gap-6 md:gap-10 lg:gap-12 mx-auto">
-            {[...constItems, ...constItems].map((item, i) => (
+          <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start items-start gap-6 md:gap-10 lg:gap-12 mx-auto">
+            {[...constItems, ...constItems, ...constItems].map((item, i) => (
               <div 
                 key={i} 
-                className={`flex flex-row items-center gap-3 pr-2 flex-shrink-0 group cursor-default select-none pointer-events-auto ${i >= constItems.length ? 'md:hidden' : ''}`}
+                className="flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-default select-none pointer-events-auto"
               >
-                <span className="text-[11px] md:text-xs font-bold text-white uppercase tracking-wider opacity-85 transition-colors whitespace-nowrap drop-shadow-md">{item.label}</span>
                 <div 
-                  className="w-10 h-10 md:w-12 md:h-12 bg-blue-900 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-blue-100 transition-all duration-300"
-                  style={{ viewTransitionName: i >= constItems.length ? 'none' : `circle-const-${i}` }}
+                  className="w-12 h-12 bg-blue-900 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-blue-100 transition-all duration-300"
+                  style={{ viewTransitionName: i < constItems.length ? `circle-const-${i}` : 'none' }}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">
                     {item.icon}
                   </div>
                 </div>
+                <span className="text-[11px] font-bold text-white mt-2.5 uppercase tracking-wider opacity-85 transition-colors text-center max-w-full drop-shadow-md leading-tight">{item.label}</span>
               </div>
             ))}
           </div>
