@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: houseforce-dev-db
+    environment:
+      POSTGRES_DB: strapi
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: houseforce-dev-backend
+    command: npm run develop
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: password
+      DATABASE_SSL: "false"
+      APP_KEYS: "changeMe1,changeMe2"
+      API_TOKEN_SALT: "changeMe"
+      ADMIN_JWT_SECRET: "changeMe"
+      TRANSFER_TOKEN_SALT: "changeMe"
+      JWT_SECRET: "changeMe"
+      NODE_ENV: development
+    volumes:
+      - ./backend:/opt/app
+      - /opt/app/node_modules
+      - /opt/app/build
+      - /opt/app/.tmp
+    ports:
+      - "1337:1337"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: houseforce-dev-frontend
+    command: npm run dev
+    environment:
+      STRAPI_INTERNAL_URL: http://backend:1337
+      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:

@@ -2,12 +2,15 @@ import { notFound } from 'next/navigation';
 
 async function getPost(slug: string) {
   try {
-    const res = await fetch(`http://127.0.0.1:1337/api/posts?filters[slug][$eq]=${slug}&populate=*`, { cache: 'no-store' });
-    if (!res.ok) {
-      throw new Error('Failed to fetch post');
-    }
+    const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+    // Use filters[slug][$eq]=... instead of /api/posts/slug
+    const res = await fetch(
+      `${strapiFetchUrl}/api/posts?filters[slug][$eq]=${slug}&populate=*`, 
+      { cache: 'no-store' }
+    );
+    if (!res.ok) throw new Error('Failed to fetch post');
     const json = await res.json();
-    return json.data[0];
+    return json.data && json.data.length > 0 ? json.data[0] : null;
   } catch (error) {
     console.error(error);
     return null;

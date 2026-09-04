@@ -3,8 +3,8 @@ import { ArrowRight, Calendar, Tag } from 'lucide-react';
 
 async function getPosts() {
   try {
-    const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
-    const res = await fetch(`${strapiBase}/api/posts?populate=*`, { cache: 'no-store' });
+    const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+    const res = await fetch(`${strapiFetchUrl}/api/posts?populate=*`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch posts');
     return res.json();
   } catch (error) {
@@ -15,8 +15,8 @@ async function getPosts() {
 
 async function getCategories() {
   try {
-    const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
-    const res = await fetch(`${strapiBase}/api/categories`, { cache: 'no-store' });
+    const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+    const res = await fetch(`${strapiFetchUrl}/api/categories`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch categories');
     return res.json();
   } catch (error) {
