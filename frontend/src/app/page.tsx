@@ -193,7 +193,7 @@ export default function Home() {
                   <span className="text-blue-300 font-semibold tracking-wider uppercase text-xs md:text-sm mb-2 md:mb-4">Led by Paul Reddy</span>
                   <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
                   <p className="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-sm font-light drop-shadow px-4 md:px-0 hidden sm:block">
-                    30+ years of expertise. &quot;Quality First&quot; property renovations in Torrevieja.
+                    30+ years of expertise. <span className="text-amber-300 font-extrabold drop-shadow">Quality First</span> property renovations in Torrevieja.
                   </p>
 
                   <AnimatePresence>
@@ -234,7 +234,7 @@ export default function Home() {
                   <span className="text-teal-200 font-semibold tracking-wider uppercase text-xs md:text-sm mb-2 md:mb-4">Managed by Paige</span>
                   <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-6 text-white tracking-tight drop-shadow-md">Keyholding<br/>& Cleaning</h2>
                   <p className="text-base md:text-lg text-teal-50 mb-6 md:mb-8 max-w-sm font-light drop-shadow px-4 md:px-0 hidden sm:block">
-                    Total peace of mind for your Spanish property with meticulous cleaning and security.
+                    <span className="text-amber-300 font-extrabold drop-shadow">Total peace of mind</span> for your Spanish property with meticulous cleaning and security.
                   </p>
 
                   <AnimatePresence>
@@ -262,11 +262,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Slogan / Brand Motto Banner */}
+      <div className="w-full bg-slate-900 text-white py-4 px-4 border-y border-slate-800 relative z-20 shadow-md">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
+          <span className="text-amber-400 font-serif italic text-lg sm:text-xl font-medium tracking-wide">
+            Excellence is a way of life
+          </span>
+          <span className="hidden sm:inline text-slate-500">•</span>
+          <span className="text-slate-300 text-xs uppercase tracking-widest font-semibold">
+            The HouseForce Commitment
+          </span>
+        </div>
+      </div>
+
       {/* Trust & Family Section */}
       <section className="w-full bg-white py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200 relative overflow-hidden z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.06)]">
         <div className="max-w-6xl mx-auto text-center">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-900 font-bold text-xs uppercase tracking-widest mb-4">
-            <Award className="w-4 h-4 text-blue-700" />
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 font-bold text-xs uppercase tracking-widest mb-4">
+            <Award className="w-4 h-4 text-amber-500" />
             20+ Years Operating in Torrevieja, La Mata &amp; Costa Blanca
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
@@ -552,13 +565,13 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-slate-300 transition-colors">
-              <div className="w-12 h-12 bg-teal-100 text-teal-800 rounded-xl flex items-center justify-center mb-4">
+            <div className="bg-amber-500/5 rounded-2xl p-6 border border-amber-300/80 hover:border-amber-400 transition-colors shadow-sm">
+              <div className="w-12 h-12 bg-amber-500/15 text-amber-600 rounded-xl flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Quality First Standard</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Excellence is a Way of Life</h3>
               <p className="text-slate-600 text-sm font-light leading-relaxed">
-                We never cut corners on materials, craftsmanship, or cleaning standards. Period.
+                Our core motto. We never cut corners on materials, craftsmanship, or cleaning quality.
               </p>
             </div>
           </div>
@@ -655,7 +668,8 @@ export default function Home() {
       {/* Bottom CTA Banner */}
       <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-950 via-slate-900 to-teal-950 text-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="px-4 py-1.5 rounded-full bg-white/10 text-teal-300 font-bold text-xs uppercase tracking-widest inline-block mb-4 backdrop-blur-md">
+          <span className="px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 mb-4 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             Torrevieja &amp; Costa Blanca Property Services
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold mb-6 tracking-tight leading-tight">

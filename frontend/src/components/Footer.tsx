@@ -5,9 +5,12 @@ export default function Footer() {
     <footer className="bg-slate-900 text-white py-16 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
         <div>
-          <h3 className="text-2xl font-extrabold mb-4 tracking-tight">House<span className="text-teal-400">Force</span></h3>
+          <h3 className="text-2xl font-extrabold mb-4 tracking-tight">House<span className="text-teal-400">Force</span><span className="text-amber-400">.</span></h3>
           <p className="text-slate-400 font-light leading-relaxed">
-            Family run property reforming & keyholding services in Torrevieja. Quality first, always.
+            Family run property reforming &amp; keyholding services in Torrevieja.
+          </p>
+          <p className="text-amber-400/90 text-xs font-serif italic mt-3 font-medium">
+            Excellence is a way of life
           </p>
         </div>
         <div>

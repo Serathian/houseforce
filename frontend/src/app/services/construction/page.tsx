@@ -169,7 +169,7 @@ export default function ConstructionPage() {
             <span className="text-blue-300 font-semibold tracking-wider uppercase text-xs md:text-sm mb-2 md:mb-4">Led by Paul Reddy</span>
             <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-6 text-white tracking-tight drop-shadow-md">Construction<br/>& Reforming</h2>
             <p className="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-sm font-light drop-shadow">
-              30+ years of expertise. &quot;Quality First&quot; property renovations in Torrevieja.
+              30+ years of expertise. <span className="text-amber-300 font-extrabold drop-shadow">Quality First</span> property renovations in Torrevieja.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -235,7 +235,7 @@ export default function ConstructionPage() {
           <span className="text-blue-900 font-bold text-xs uppercase tracking-widest block mb-2">Over 20 Years in Torrevieja</span>
           <h2 className="text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">Comprehensive Building &amp; Reform Services</h2>
           <p className="text-slate-600 text-lg leading-relaxed font-light">
-            We handle everything from initial planning permissions to the final coat of paint. With Paul personally overseeing every site alongside Skippy, you can be assured that no detail is overlooked.
+            We handle everything from initial planning permissions to the final coat of paint. With Paul personally overseeing every site alongside Skippy, you can be assured that <span className="text-amber-600 font-semibold">no detail is overlooked</span>.
           </p>
         </div>
 
@@ -244,7 +244,7 @@ export default function ConstructionPage() {
           <div className="col-span-full bg-gradient-to-br from-blue-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-lg border border-blue-900/80 flex flex-col justify-between group">
             <div className="relative z-10">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 font-bold text-xs uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold text-xs uppercase tracking-wider">
                   Overseen by Paul Reddy
                 </span>
                 <span className="text-xs font-medium text-slate-200 bg-white/10 px-3 py-1 rounded-full border border-white/10">
@@ -269,8 +269,8 @@ export default function ConstructionPage() {
                   <span>Salt-Air &amp; Damp Resistant Materials</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                  <span>Direct On-Site Management by Paul</span>
+                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span className="text-amber-200 font-semibold">Direct On-Site Management by Paul</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-400"></span>

@@ -157,7 +157,7 @@ export default function KeyholdingPage() {
             <span className="text-teal-200 font-semibold tracking-wider uppercase text-xs md:text-sm mb-2 md:mb-4">Managed by Paige</span>
             <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-6 text-white tracking-tight drop-shadow-md">Keyholding<br/>& Cleaning</h2>
             <p className="text-base md:text-lg text-teal-50 mb-6 md:mb-8 max-w-sm font-light drop-shadow">
-              Total peace of mind for your Spanish property with meticulous cleaning and security.
+              <span className="text-amber-300 font-extrabold drop-shadow">Total peace of mind</span> for your Spanish property with meticulous cleaning and security.
             </p>
             {/* Scroll Down CTA */}
             <motion.div
@@ -224,7 +224,7 @@ export default function KeyholdingPage() {
           <span className="text-teal-800 font-bold text-xs uppercase tracking-widest block mb-2">Property Care in Torrevieja</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Keyholding &amp; Property Care Services</h2>
           <p className="text-slate-600 text-lg leading-relaxed font-light">
-            Managed directly by Paige Reddy, with 30+ years of building and maintenance support from Paul &amp; Skippy whenever repairs are needed.
+            Managed directly by Paige Reddy, with 30+ years of building and maintenance support from Paul &amp; Skippy so your home is <span className="text-amber-600 font-semibold">always in safe hands</span>.
           </p>
         </div>
 
@@ -234,7 +234,7 @@ export default function KeyholdingPage() {
           <div className="md:col-span-2 bg-gradient-to-br from-teal-900 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-lg border border-teal-800/80 flex flex-col justify-between group">
             <div className="relative z-10">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-200 font-bold text-xs uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold text-xs uppercase tracking-wider">
                   Managed by Paige Reddy
                 </span>
                 <span className="text-xs font-medium text-teal-200 bg-white/10 px-3 py-1 rounded-full border border-white/10">
@@ -263,8 +263,8 @@ export default function KeyholdingPage() {
                   <span>Post-Storm &amp; Heavy Rain Checkouts</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-teal-400"></span>
-                  <span>Full Building &amp; Plumbing Backup by Paul &amp; Skippy</span>
+                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span className="text-amber-200 font-semibold">Full Building &amp; Plumbing Backup by Paul &amp; Skippy</span>
                 </div>
               </div>
 
@@ -287,7 +287,7 @@ export default function KeyholdingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={benefit.icon} />
                     </svg>
                   </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-teal-950 bg-teal-50/80 border border-teal-200/80 px-3 py-1 rounded-full">
+                  <span className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${benefit.title.includes('Emergency') ? 'text-amber-800 bg-amber-50 border-amber-200' : 'text-teal-950 bg-teal-50/80 border-teal-200/80'}`}>
                     {benefit.badge}
                   </span>
                 </div>

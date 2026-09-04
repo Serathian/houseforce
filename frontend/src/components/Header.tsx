@@ -33,7 +33,7 @@ export default function Header() {
           {/* Logo (Left) */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" onClick={handleLogoClick} className="text-2xl font-extrabold text-blue-900 tracking-tight">
-              House<span className="text-teal-600">Force</span>
+              House<span className="text-teal-600">Force</span><span className="text-amber-500">.</span>
             </Link>
           </div>
           
@@ -125,7 +125,7 @@ export default function Header() {
             <div className="px-4 sm:px-6">
               <div className="flex justify-between items-center h-20">
                 <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-extrabold text-blue-900 tracking-tight">
-                  House<span className="text-teal-600">Force</span>
+                  House<span className="text-teal-600">Force</span><span className="text-amber-500">.</span>
                 </Link>
                 <button 
                   onClick={() => setIsOpen(false)} 

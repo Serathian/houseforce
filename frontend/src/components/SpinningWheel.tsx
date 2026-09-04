@@ -101,7 +101,7 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
           animate={{ scale: expandedSide ? 0 : 1, opacity: expandedSide ? 0 : 1 }}
           transition={swipeTransition}
         >
-          <span className="font-extrabold text-xl text-blue-900 tracking-tighter">H<span className="text-teal-600">F</span></span>
+          <span className="font-extrabold text-xl text-blue-900 tracking-tighter">H<span className="text-teal-600">F</span><span className="text-amber-500">.</span></span>
         </motion.div>
 
         {/* Left Half Wrapper (Construction) */}
