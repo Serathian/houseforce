@@ -32,31 +32,48 @@ export default async function Blog() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {posts.map((post: any) => (
-              <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
-                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col">
-                  <div className="h-56 bg-slate-200 w-full object-cover group-hover:opacity-90 transition-opacity flex items-center justify-center text-slate-400 relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
-                    <span className="relative z-10">{post.coverImage ? 'Image' : 'No Cover'}</span>
-                  </div>
-                  <div className="p-8 flex-grow flex flex-col">
-                    {post.category && (
-                      <span className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3 block">
-                        {post.category.name}
-                      </span>
-                    )}
-                    <h2 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
-                      {post.title}
-                    </h2>
-                    <div className="mt-auto">
-                      <p className="text-slate-400 text-sm font-medium">
-                        {new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </p>
+            {posts.map((post: any) => {
+              const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+              const coverUrl = post.coverImage?.url 
+                ? (post.coverImage.url.startsWith('http') ? post.coverImage.url : `${strapiBase}${post.coverImage.url}`)
+                : null;
+
+              return (
+                <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
+                  <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col">
+                    <div className="h-56 bg-slate-800 w-full overflow-hidden relative">
+                      {coverUrl ? (
+                        <img 
+                          src={coverUrl} 
+                          alt={post.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-400 font-medium">
+                          HouseForce Showcase
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+                    </div>
+                    <div className="p-8 flex-grow flex flex-col">
+                      {post.category && (
+                        <span className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3 block">
+                          {post.category.name}
+                        </span>
+                      )}
+                      <h2 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
+                        {post.title}
+                      </h2>
+                      <div className="mt-auto">
+                        <p className="text-slate-400 text-sm font-medium">
+                          {new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
