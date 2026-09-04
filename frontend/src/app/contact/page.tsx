@@ -3,7 +3,7 @@ export default function Contact() {
     <div className="bg-slate-50 min-h-screen py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Let's Talk</h1>
+          <h1 className="text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Let&apos;s Talk</h1>
           <p className="text-xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">
             Whether you need a full villa reform or a trusted team to hold your keys, Paul and Paige are ready to help.
           </p>

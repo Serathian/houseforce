@@ -10,7 +10,7 @@ WORKDIR /opt/app
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 # Copy the rest of the application
 COPY . .

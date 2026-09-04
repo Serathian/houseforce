@@ -1,6 +1,22 @@
 import { Link } from 'next-view-transitions';
 import { ArrowRight, Calendar, Tag } from 'lucide-react';
 
+interface StrapiCategory {
+  name: string;
+  slug: string;
+}
+
+interface StrapiPost {
+  id: string | number;
+  title: string;
+  slug: string;
+  content: string;
+  createdAt: string;
+  authorName?: string;
+  category?: StrapiCategory;
+  coverImage?: { url: string };
+}
+
 async function getPosts() {
   try {
     const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
@@ -53,11 +69,11 @@ export default async function Blog({
     }
   };
 
-  cmsCategoriesRaw.forEach((cat: any) => {
+  cmsCategoriesRaw.forEach((cat: StrapiCategory) => {
     if (cat.name) addCat(cat.name, cat.slug);
   });
 
-  posts.forEach((post: any) => {
+  posts.forEach((post: StrapiPost) => {
     if (post.category?.name) addCat(post.category.name, post.category.slug);
   });
 
@@ -69,7 +85,7 @@ export default async function Blog({
   // Filter posts by category if specified
   const filteredPosts = activeCategory === 'all'
     ? posts
-    : posts.filter((post: any) => {
+    : posts.filter((post: StrapiPost) => {
         const catName = post.category?.name?.toLowerCase() || '';
         const catSlug = post.category?.slug?.toLowerCase() || '';
         const titleText = post.title?.toLowerCase() || '';
@@ -87,7 +103,7 @@ export default async function Blog({
   const featuredPost = filteredPosts.length > 0 ? filteredPosts[0] : null;
   const remainingPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : [];
 
-  const getImageUrl = (post: any) => {
+  const getImageUrl = (post: StrapiPost) => {
     if (!post?.coverImage?.url) return null;
     return post.coverImage.url.startsWith('http') 
       ? post.coverImage.url 
@@ -192,7 +208,7 @@ export default async function Blog({
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-8 tracking-tight">More Project Showcases</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {remainingPosts.map((post: any) => {
+                  {remainingPosts.map((post: StrapiPost) => {
                     const coverUrl = getImageUrl(post);
                     return (
                       <Link href={`/blog/${post.slug}`} key={post.id} className="block group">

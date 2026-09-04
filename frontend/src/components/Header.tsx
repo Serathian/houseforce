@@ -11,22 +11,48 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-[100] border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="relative flex justify-between items-center h-20">
+          
+          {/* Logo (Left) */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="text-2xl font-extrabold text-blue-900 tracking-tight">
               House<span className="text-teal-600">Force</span>
             </Link>
           </div>
           
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-8">
-            <Link href="/" className="text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-semibold transition-colors">Home</Link>
-            <Link href="/about" className="text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-semibold transition-colors">About Us</Link>
-            <Link href="/services/construction" className="text-blue-700 hover:text-blue-900 px-3 py-2 text-sm font-bold transition-colors">Construction</Link>
-            <Link href="/services/keyholding" className="text-teal-600 hover:text-teal-800 px-3 py-2 text-sm font-bold transition-colors">Keyholding</Link>
-            <Link href="/blog" className="text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-semibold transition-colors">Blog</Link>
-            <Link href="/contact" className="bg-blue-900 text-white hover:bg-blue-800 px-5 py-2 rounded-full text-sm font-bold transition-all shadow-sm hover:shadow-md">Contact</Link>
+          {/* Primary Service Items (Dead-Centered on Screen) */}
+          <nav className="hidden md:flex items-center space-x-1.5 bg-slate-100/90 p-1.5 rounded-full border border-slate-200/80 shadow-inner absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+            <Link 
+              href="/services/construction" 
+              className="px-5 py-2 rounded-full text-xs lg:text-sm font-extrabold text-blue-950 hover:bg-white hover:text-blue-900 hover:shadow-sm transition-all flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-blue-900"></span>
+              <span>Construction</span>
+            </Link>
+            <Link 
+              href="/services/keyholding" 
+              className="px-5 py-2 rounded-full text-xs lg:text-sm font-extrabold text-teal-950 hover:bg-white hover:text-teal-800 hover:shadow-sm transition-all flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+              <span>Keyholding</span>
+            </Link>
           </nav>
+
+          {/* Secondary Items (Right) */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/about" className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
+              About Us
+            </Link>
+            <Link href="/blog" className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
+              Blog
+            </Link>
+            <Link 
+              href="/contact" 
+              className="bg-blue-950 text-white hover:bg-blue-900 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm hover:shadow-md"
+            >
+              Contact
+            </Link>
+          </div>
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center">
@@ -51,7 +77,7 @@ export default function Header() {
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className="fixed inset-0 w-full h-[100dvh] bg-white z-[200] flex flex-col"
           >
-            {/* Mobile Header (replicated inside overlay to align button) */}
+            {/* Mobile Header */}
             <div className="px-4 sm:px-6">
               <div className="flex justify-between items-center h-20">
                 <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-extrabold text-blue-900 tracking-tight">
@@ -68,15 +94,51 @@ export default function Header() {
             </div>
             
             {/* Mobile Nav Links */}
-            <nav className="flex flex-col flex-grow justify-center space-y-8 px-8 pb-20">
-              <Link href="/" onClick={() => setIsOpen(false)} className="text-4xl font-extrabold text-slate-800 hover:text-blue-600 transition-colors">Home</Link>
-              <Link href="/about" onClick={() => setIsOpen(false)} className="text-4xl font-extrabold text-slate-800 hover:text-blue-600 transition-colors">About Us</Link>
-              <Link href="/services/construction" onClick={() => setIsOpen(false)} className="text-4xl font-extrabold text-blue-700 hover:text-blue-900 transition-colors">Construction</Link>
-              <Link href="/services/keyholding" onClick={() => setIsOpen(false)} className="text-4xl font-extrabold text-teal-600 hover:text-teal-800 transition-colors">Keyholding</Link>
-              <Link href="/blog" onClick={() => setIsOpen(false)} className="text-4xl font-extrabold text-slate-800 hover:text-blue-600 transition-colors">Blog</Link>
+            <nav className="flex flex-col flex-grow justify-center space-y-6 px-8 pb-16">
+              <div className="space-y-4 pb-6 border-b border-slate-100">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400 block">Primary Services</span>
+                <Link 
+                  href="/services/construction" 
+                  onClick={() => setIsOpen(false)} 
+                  className="flex items-center gap-3 text-3xl font-extrabold text-blue-950 hover:text-blue-700 transition-colors"
+                >
+                  <span className="w-3 h-3 rounded-full bg-blue-900"></span>
+                  <span>Construction</span>
+                </Link>
+                <Link 
+                  href="/services/keyholding" 
+                  onClick={() => setIsOpen(false)} 
+                  className="flex items-center gap-3 text-3xl font-extrabold text-teal-900 hover:text-teal-600 transition-colors"
+                >
+                  <span className="w-3 h-3 rounded-full bg-teal-600"></span>
+                  <span>Keyholding</span>
+                </Link>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400 block">Company</span>
+                <Link 
+                  href="/about" 
+                  onClick={() => setIsOpen(false)} 
+                  className="block text-2xl font-bold text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                  About Us
+                </Link>
+                <Link 
+                  href="/blog" 
+                  onClick={() => setIsOpen(false)} 
+                  className="block text-2xl font-bold text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                  Blog
+                </Link>
+              </div>
               
-              <div className="pt-8">
-                <Link href="/contact" onClick={() => setIsOpen(false)} className="inline-block w-full text-center bg-blue-900 text-white hover:bg-blue-800 px-8 py-4 rounded-full text-xl font-bold transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+              <div className="pt-6">
+                <Link 
+                  href="/contact" 
+                  onClick={() => setIsOpen(false)} 
+                  className="inline-block w-full text-center bg-blue-950 text-white hover:bg-blue-900 px-8 py-4 rounded-full text-lg font-bold transition-all shadow-xl"
+                >
                   Contact Us
                 </Link>
               </div>

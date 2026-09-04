@@ -8,7 +8,7 @@ import { constItems, keyItems } from '@/data/services';
 interface Props {
   expandedSide: 'left' | 'right' | null;
   setExpandedSide: (side: 'left' | 'right' | null) => void;
-  swipeTransition: any;
+  swipeTransition: Record<string, unknown>;
   clipStrLeft: string;
   clipStrRight: string;
   isMobile: boolean;
