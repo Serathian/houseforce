@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "updates",
+  "info": {
+    "singularName": "update",
+    "pluralName": "updates",
+    "displayName": "Project Update",
+    "description": "An update or log entry for a specific project"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "date": {
+      "type": "date"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images", "files", "videos"]
+    },
+    "project": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::project.project",
+      "inversedBy": "updates"
+    }
+  }
+}
