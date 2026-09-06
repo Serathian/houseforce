@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from 'next-view-transitions';
 import SupportTriggerButton from "@/components/SupportTriggerButton";
 
 
@@ -19,7 +20,7 @@ interface Project {
   documentId: string;
   title: string;
   address: string;
-  status: "planning" | "in-progress" | "completed" | "on-hold";
+  projectStatus: "planning" | "in-progress" | "completed" | "on-hold";
   updates: ProjectUpdate[];
   updatedAt: string;
 }
@@ -101,7 +102,7 @@ export default async function DashboardPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <span className="bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                      {project.status.replace('-', ' ')}
+                      {project.projectStatus.replace('-', ' ')}
                     </span>
                     <span className="text-slate-400 text-sm font-medium">
                       Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
@@ -110,9 +111,9 @@ export default async function DashboardPage() {
                   <h2 className="text-2xl font-bold text-slate-800">{project.title}</h2>
                   <p className="text-slate-500 mt-1">{project.address || "No address specified"}</p>
                 </div>
-                <button className="bg-slate-100 text-slate-700 hover:bg-blue-950 hover:text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0">
+                <Link href={`/projects/${project.documentId}`} className="inline-block bg-slate-100 text-slate-700 hover:bg-blue-950 hover:text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 text-center">
                   View Updates
-                </button>
+                </Link>
               </div>
               
               {/* Latest Update Highlight */}

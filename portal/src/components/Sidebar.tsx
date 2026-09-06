@@ -12,8 +12,7 @@ interface SidebarProps {
 
 const navLinks = [
   { href: "/", label: "Dashboard", icon: Home },
-  { href: "/projects", label: "My Projects", icon: Hammer },
-  { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/projects", label: "Projects", icon: Hammer },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

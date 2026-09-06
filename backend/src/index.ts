@@ -45,6 +45,33 @@ export default {
         }
       }
 
+      // Auto-grant Authenticated users the ability to read Projects and Updates
+      const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+        where: { type: 'authenticated' },
+      });
+
+      if (authRole) {
+        const authActions = [
+          'api::project.project.find',
+          'api::project.project.findOne',
+          'api::update.update.find',
+          'api::update.update.findOne'
+        ];
+
+        for (const action of authActions) {
+          const existing = await strapi.db.query('plugin::users-permissions.permission').findOne({
+            where: { action, role: authRole.id },
+          });
+
+          if (!existing) {
+            await strapi.db.query('plugin::users-permissions.permission').create({
+              data: { action, role: authRole.id },
+            });
+            console.log(`[Strapi Bootstrap] Granted authenticated access for action: ${action}`);
+          }
+        }
+      }
+
       // Add Lifecycle hook to force provider to 'google' for new users created in Admin Panel
       strapi.db.lifecycles.subscribe({
         models: ['plugin::users-permissions.user'],
