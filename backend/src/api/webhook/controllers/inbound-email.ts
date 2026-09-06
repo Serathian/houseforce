@@ -1,9 +1,16 @@
 import { Core } from '@strapi/strapi';
+import type { Context } from 'koa';
+
+interface PostmarkInboundPayload {
+  From: string;
+  To: string;
+  TextBody: string;
+}
 
 export default {
-  async receive(ctx) {
+  async receive(ctx: Context) {
     try {
-      const payload = ctx.request.body;
+      const payload = ctx.request.body as PostmarkInboundPayload;
       strapi.log.info('Received inbound email webhook payload:', payload);
 
       // We'll need to adapt this depending on whether we use SendGrid, Postmark, etc.

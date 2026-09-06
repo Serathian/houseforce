@@ -5,6 +5,16 @@ import { format, parseISO } from "date-fns";
 import { Link } from 'next-view-transitions';
 import { ArrowLeft, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { UpdateThread } from "@/components/UpdateThread";
+
+interface UpdateMessage {
+  id: number;
+  documentId: string;
+  content: string;
+  authorType: 'staff' | 'client';
+  staffName?: string;
+  createdAt: string;
+}
 
 interface ProjectUpdate {
   id: number;
@@ -13,6 +23,7 @@ interface ProjectUpdate {
   content: string;
   date: string;
   createdAt: string;
+  messages?: UpdateMessage[];
 }
 
 interface Project {
@@ -29,8 +40,8 @@ interface Project {
 async function getProject(documentId: string, token: string): Promise<Project | null> {
   try {
     const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
-    // Querying explicitly by documentId to be safe
-    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate=updates`, {
+    // Querying explicitly by documentId to be safe, now populating updates and their messages
+    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate][0]=messages`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -135,7 +146,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </div>
       ) : (
         <div className="relative border-l-2 border-slate-200 ml-4 sm:ml-6 space-y-10 pb-10">
-          {sortedUpdates.map((update, index) => (
+          {sortedUpdates.map((update) => (
             <div key={update.id} className="relative pl-8 sm:pl-12">
               {/* Timeline Node */}
               <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-4 border-teal-500 shadow-sm"></div>
@@ -156,6 +167,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     <ReactMarkdown>{update.content}</ReactMarkdown>
                   </div>
                 )}
+
+                <UpdateThread 
+                  updateId={update.id} 
+                  initialMessages={update.messages} 
+                  token={session.strapiToken} 
+                />
               </div>
             </div>
           ))}

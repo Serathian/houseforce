@@ -61,6 +61,24 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       },
     },
   },
+  email: {
+    config: {
+      provider: 'nodemailer',
+      providerOptions: {
+        host: 'smtp.postmarkapp.com',
+        port: 587,
+        auth: {
+          user: env('POSTMARK_API_TOKEN'),
+          pass: env('POSTMARK_API_TOKEN'),
+        },
+        // ... any custom nodemailer options
+      },
+      settings: {
+        defaultFrom: env('EMAIL_DEFAULT_FROM', 'updates@replies.houseforce.com'),
+        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO', 'updates@replies.houseforce.com'),
+      },
+    },
+  },
 });
 
 export default config;

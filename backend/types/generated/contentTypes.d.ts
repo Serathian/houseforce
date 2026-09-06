@@ -543,6 +543,44 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiUpdateMessageUpdateMessage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'update_messages';
+  info: {
+    description: 'A single message in a project update thread';
+    displayName: 'Update Message';
+    pluralName: 'update-messages';
+    singularName: 'update-message';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    authorType: Schema.Attribute.Enumeration<['staff', 'client']> &
+      Schema.Attribute.DefaultTo<'client'>;
+    clientAuthor: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    content: Schema.Attribute.RichText & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::update-message.update-message'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    staffName: Schema.Attribute.String;
+    update: Schema.Attribute.Relation<'manyToOne', 'api::update.update'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiUpdateUpdate extends Struct.CollectionTypeSchema {
   collectionName: 'updates';
   info: {
@@ -567,6 +605,10 @@ export interface ApiUpdateUpdate extends Struct.CollectionTypeSchema {
       'api::update.update'
     > &
       Schema.Attribute.Private;
+    messages: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::update-message.update-message'
+    >;
     project: Schema.Attribute.Relation<'manyToOne', 'api::project.project'>;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1090,6 +1132,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::post.post': ApiPostPost;
       'api::project.project': ApiProjectProject;
+      'api::update-message.update-message': ApiUpdateMessageUpdateMessage;
       'api::update.update': ApiUpdateUpdate;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
