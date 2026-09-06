@@ -12,6 +12,8 @@ export default function Header() {
 
   const isConstruction = pathname === '/services/construction';
   const isKeyholding = pathname === '/services/keyholding';
+  const isAbout = pathname === '/about';
+  const isBlog = pathname.startsWith('/blog');
 
   const handleNavHover = (item: 'construction' | 'keyholding' | null) => {
     if (typeof window !== 'undefined') {
@@ -84,10 +86,10 @@ export default function Header() {
 
           {/* Secondary Items (Right) */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/about" className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
+            <Link href="/about" className={`hover:text-slate-900 text-sm font-semibold transition-colors ${isAbout ? 'text-slate-900 underline underline-offset-4 decoration-2 decoration-blue-900' : 'text-slate-600'}`}>
               About Us
             </Link>
-            <Link href="/blog" className="text-slate-600 hover:text-slate-900 text-sm font-semibold transition-colors">
+            <Link href="/blog" className={`hover:text-slate-900 text-sm font-semibold transition-colors ${isBlog ? 'text-slate-900 underline underline-offset-4 decoration-2 decoration-blue-900' : 'text-slate-600'}`}>
               Blog
             </Link>
             <Link 
@@ -164,14 +166,14 @@ export default function Header() {
                 <Link 
                   href="/about" 
                   onClick={() => setIsOpen(false)} 
-                  className="block text-2xl font-bold text-slate-700 hover:text-slate-900 transition-colors"
+                  className={`block text-2xl font-bold hover:text-slate-900 transition-colors ${isAbout ? 'text-slate-900 underline underline-offset-8 decoration-4 decoration-blue-900' : 'text-slate-700'}`}
                 >
                   About Us
                 </Link>
                 <Link 
                   href="/blog" 
                   onClick={() => setIsOpen(false)} 
-                  className="block text-2xl font-bold text-slate-700 hover:text-slate-900 transition-colors"
+                  className={`block text-2xl font-bold hover:text-slate-900 transition-colors ${isBlog ? 'text-slate-900 underline underline-offset-8 decoration-4 decoration-blue-900' : 'text-slate-700'}`}
                 >
                   Blog
                 </Link>

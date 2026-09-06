@@ -35,7 +35,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
-      provider: 'aws-s3',
+      provider: '@strapi/provider-upload-aws-s3',
       providerOptions: {
         s3Options: {
           credentials: {
