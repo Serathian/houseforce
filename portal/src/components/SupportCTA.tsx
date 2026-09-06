@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { MessageSquare, X, Mail, LifeBuoy } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function SupportCTA() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
+
+  // Hide for authenticated users — they have the nav menu pill instead
+  if (status === "loading" || session) return null;
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end pointer-events-none">
