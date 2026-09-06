@@ -21,7 +21,41 @@ export default function ConstructionPage() {
     return () => window.removeEventListener('nav-hover-sliver', handleNavHover);
   }, []);
 
+  const [isScrollable, setIsScrollable] = useState(false);
+
   useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const checkSize = () => {
+      const inner = el.children[0] as HTMLElement;
+      if (!inner || inner.children.length === 0) return;
+      
+      const firstChild = inner.children[0] as HTMLElement;
+      // Get the last child of the FIRST set of items
+      const lastChildIndex = constItems.length - 1;
+      const lastChild = inner.children[lastChildIndex] as HTMLElement;
+      
+      if (firstChild && lastChild) {
+        // Calculate the exact width of the first set of items
+        const singleSetWidth = lastChild.offsetLeft + lastChild.offsetWidth - firstChild.offsetLeft;
+        // px-6 is 24px left + 24px right = 48px padding
+        if (singleSetWidth + 48 > el.clientWidth) {
+          setIsScrollable(true);
+        } else {
+          setIsScrollable(false);
+        }
+      }
+    };
+
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, [isScrollable]);
+
+  useEffect(() => {
+    if (!isScrollable) return;
+
     const el = scrollRef.current;
     if (!el) return;
     
@@ -73,8 +107,9 @@ export default function ConstructionPage() {
       el.removeEventListener('mouseleave', resume);
       el.removeEventListener('touchstart', pause);
       el.removeEventListener('touchend', resume);
+      el.scrollLeft = 0;
     };
-  }, []);
+  }, [isScrollable]);
 
   const services = [
     {
@@ -207,9 +242,9 @@ export default function ConstructionPage() {
         </div>
 
         {/* The 8 Icons - Now gracefully arranged in a sleek horizontal menu bar below the hero */}
-        <div ref={scrollRef} className="absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="relative min-w-max px-6 py-3 md:py-4 flex flex-row justify-start items-start gap-6 md:gap-10 lg:gap-12 mx-auto">
-            {[...constItems, ...constItems, ...constItems].map((item, i) => (
+        <div ref={scrollRef} className={`absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 ${isScrollable ? 'overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]' : 'overflow-hidden'}`}>
+          <div className={`relative min-w-max px-6 py-3 md:py-4 flex flex-row items-start gap-6 md:gap-10 lg:gap-12 mx-auto ${isScrollable ? 'justify-start' : 'justify-center'}`}>
+            {(isScrollable ? [...constItems, ...constItems, ...constItems] : constItems).map((item, i) => (
               <div 
                 key={i} 
                 className="flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-default select-none pointer-events-auto"
@@ -228,6 +263,7 @@ export default function ConstructionPage() {
           </div>
         </div>
       </section>
+
 
       {/* Main Content */}
       <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
