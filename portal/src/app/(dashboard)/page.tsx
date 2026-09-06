@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import SupportTriggerButton from "@/components/SupportTriggerButton";
+
 
 // Types based on the Strapi schema we built
 interface ProjectUpdate {
@@ -64,16 +66,27 @@ export default async function DashboardPage() {
       </header>
 
       {projects.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-10 sm:p-14 text-center shadow-sm">
+          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-5">
             <svg className="w-8 h-8 text-blue-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-slate-800">No Projects Found</h3>
-          <p className="text-slate-500 mt-2 max-w-sm mx-auto">
-            You don't have any active projects linked to your account yet. HouseForce will link your project shortly.
+          <h3 className="text-xl font-bold text-slate-800">No projects yet — but they&apos;re coming!</h3>
+          <p className="text-slate-500 mt-3 max-w-md mx-auto leading-relaxed">
+            We&apos;re in the process of getting everything set up for you. Your project will appear here shortly once it&apos;s been linked to your account.
           </p>
+          <p className="text-slate-400 mt-4 text-sm max-w-sm mx-auto">
+            Think something&apos;s not right?{" "}
+            <a
+              href="mailto:support@houseforce.biz?subject=Portal%20Project%20Access"
+              className="text-amber-600 font-semibold hover:underline"
+            >
+              Reach out to us
+            </a>{" "}
+            and we&apos;ll sort it out.
+          </p>
+          <SupportTriggerButton />
         </div>
       ) : (
         projects.map((project) => {

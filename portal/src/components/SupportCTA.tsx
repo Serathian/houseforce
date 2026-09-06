@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { MessageSquare, X, Mail, LifeBuoy } from "lucide-react";
+import { X, Mail, LifeBuoy } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useSupportPopup } from "./SupportContext";
 
 export default function SupportCTA() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, open, close } = useSupportPopup();
   const { data: session, status } = useSession();
 
   // Hide for authenticated users — they have the nav menu pill instead
@@ -21,8 +21,8 @@ export default function SupportCTA() {
               <h4 className="font-extrabold text-sm text-slate-900">Portal Support</h4>
               <p className="text-[11px] text-slate-500 font-light">Having login issues?</p>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
+            <button
+              onClick={close}
               className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               aria-label="Close support menu"
             >
@@ -32,10 +32,10 @@ export default function SupportCTA() {
 
           <div className="space-y-3">
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              If you are unable to log in, or don't see your projects listed, your email may not be linked to your properties yet.
+              If you are unable to log in, or don&apos;t see your projects listed, your email may not be linked to your properties yet.
             </p>
 
-            <a 
+            <a
               href="mailto:support@houseforce.biz?subject=Portal%20Access%20Issue"
               className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-100 transition-colors group"
             >
@@ -55,7 +55,7 @@ export default function SupportCTA() {
 
       {/* Floating Launcher Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? close() : open())}
         className="pointer-events-auto flex items-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-4 py-3 rounded-full shadow-xl border border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 group active:scale-95"
         aria-label="Toggle support menu"
       >
