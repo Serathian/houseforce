@@ -1,4 +1,29 @@
 services:
+  minio:
+    image: minio/minio:latest
+    container_name: houseforce-dev-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  minio-create-bucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadminpassword;
+      /usr/bin/mc mb myminio/uploads || true;
+      /usr/bin/mc anonymous set public myminio/uploads;
+      exit 0;
+      "
+
   db:
     image: postgres:16-alpine
     container_name: houseforce-dev-db
@@ -16,6 +41,7 @@ services:
       context: ./backend
     container_name: houseforce-dev-backend
     command: npm run develop
+    env_file: .env
     environment:
       DATABASE_CLIENT: postgres
       DATABASE_HOST: db
@@ -24,11 +50,6 @@ services:
       DATABASE_USERNAME: strapi
       DATABASE_PASSWORD: password
       DATABASE_SSL: "false"
-      APP_KEYS: "changeMe1,changeMe2"
-      API_TOKEN_SALT: "changeMe"
-      ADMIN_JWT_SECRET: "changeMe"
-      TRANSFER_TOKEN_SALT: "changeMe"
-      JWT_SECRET: "changeMe"
       NODE_ENV: development
     volumes:
       - ./backend:/opt/app
@@ -79,3 +100,4 @@ services:
 
 volumes:
   db-data:
+  minio-data:

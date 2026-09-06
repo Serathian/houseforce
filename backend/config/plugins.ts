@@ -26,6 +26,7 @@ const deniedTypes = [
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin => ({
   'users-permissions': {
     config: {
+      jwtSecret: env('JWT_SECRET'),
       jwtManagement: 'refresh',
       sessions: {
         httpOnly: true,
@@ -34,6 +35,26 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
+      provider: 'aws-s3',
+      providerOptions: {
+        s3Options: {
+          credentials: {
+            accessKeyId: env('DO_SPACE_ACCESS_KEY'),
+            secretAccessKey: env('DO_SPACE_SECRET_KEY'),
+          },
+          endpoint: env('DO_SPACE_ENDPOINT'),
+          region: env('DO_SPACE_REGION', 'us-east-1'),
+          forcePathStyle: true,
+          params: {
+            Bucket: env('DO_SPACE_BUCKET'),
+          },
+        },
+      },
+      actionOptions: {
+        upload: {},
+        uploadStream: {},
+        delete: {},
+      },
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,
