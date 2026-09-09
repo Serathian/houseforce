@@ -63,7 +63,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   email: {
     config: {
-      provider: 'nodemailer',
+      provider: '@strapi/provider-email-nodemailer',
       providerOptions: {
         host: 'smtp.postmarkapp.com',
         port: 587,
