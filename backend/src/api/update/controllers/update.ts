@@ -15,6 +15,20 @@ export default factories.createCoreController('api::update.update', ({ strapi })
       select: ['id']
     });
 
+    if (!allowedUpdates || allowedUpdates.length === 0) {
+      return {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 0,
+            total: 0,
+          },
+        },
+      };
+    }
+
     ctx.query.filters = {
       ...(typeof ctx.query.filters === 'object' ? ctx.query.filters : {}),
       id: { $in: allowedUpdates.map(u => u.id) }

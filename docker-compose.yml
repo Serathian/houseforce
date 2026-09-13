@@ -1,84 +1,39 @@
 services:
-  minio:
-    image: minio/minio:latest
-    container_name: houseforce-dev-minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadminpassword
-    volumes:
-      - minio-data:/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-
-  minio-create-bucket:
-    image: minio/mc
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadminpassword;
-      /usr/bin/mc mb myminio/uploads || true;
-      /usr/bin/mc anonymous set public myminio/uploads;
-      exit 0;
-      "
-
-  db:
-    image: postgres:16-alpine
-    container_name: houseforce-dev-db
-    environment:
-      POSTGRES_DB: strapi
-      POSTGRES_USER: strapi
-      POSTGRES_PASSWORD: password
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
   backend:
     build:
       context: ./backend
-    container_name: houseforce-dev-backend
-    command: npm run develop
-    env_file: .env
+    container_name: houseforce-backend
+    restart: unless-stopped
     environment:
       DATABASE_CLIENT: postgres
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_NAME: strapi
-      DATABASE_USERNAME: strapi
-      DATABASE_PASSWORD: password
-      DATABASE_SSL: "false"
-      NODE_ENV: development
-      SEED_TEST_DATA: "true"
-      SEED_ADMIN_EMAIL: staff@houseforce.com
-      SEED_ADMIN_PASSWORD: AdminPassword123!
-      SEED_CLIENT_EMAIL: client@example.com
-      SEED_CLIENT_PASSWORD: password123
-    volumes:
-      - ./backend:/opt/app
-      - /opt/app/node_modules
-      - /opt/app/build
-      - /opt/app/.tmp
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      JWT_SECRET: ${JWT_SECRET}
+      DO_SPACE_ACCESS_KEY: ${DO_SPACE_ACCESS_KEY}
+      DO_SPACE_SECRET_KEY: ${DO_SPACE_SECRET_KEY}
+      DO_SPACE_ENDPOINT: ${DO_SPACE_ENDPOINT}
+      DO_SPACE_BUCKET: ${DO_SPACE_BUCKET}
+      DO_SPACE_REGION: ${DO_SPACE_REGION:-us-east-1}
+      NODE_ENV: production
     ports:
       - "1337:1337"
-    depends_on:
-      - db
 
   frontend:
     build:
       context: ./frontend
-      target: deps
-    container_name: houseforce-dev-frontend
-    command: npm run dev
+    container_name: houseforce-frontend
+    restart: unless-stopped
     environment:
-      STRAPI_INTERNAL_URL: http://backend:1337
-      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      STRAPI_INTERNAL_URL: ${STRAPI_INTERNAL_URL:-http://backend:1337}
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL}
     ports:
       - "3000:3000"
     depends_on:
@@ -87,23 +42,16 @@ services:
   portal:
     build:
       context: ./portal
-      target: deps
-    container_name: houseforce-dev-portal
-    command: npm run dev
-    env_file: ./portal/.env.local
+    container_name: houseforce-portal
+    restart: unless-stopped
     environment:
-      STRAPI_INTERNAL_URL: http://backend:1337
-      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
-      NEXT_PUBLIC_ENABLE_DEV_LOGIN: "true"
-    volumes:
-      - ./portal:/app
-      - /app/node_modules
-      - /app/.next
+      STRAPI_INTERNAL_URL: ${STRAPI_INTERNAL_URL:-http://backend:1337}
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     ports:
       - "3001:3001"
     depends_on:
       - backend
-
-volumes:
-  db-data:
-  minio-data:
