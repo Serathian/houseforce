@@ -1,6 +1,6 @@
 import { Link } from 'next-view-transitions';
 import { ArrowRight, Pin } from 'lucide-react';
-import type { BlogPostItem, BlogCategory } from './HeroBlogCard';
+import type { BlogPostItem, BlogCategory } from './CategoryAnchorCard';
 
 interface BlogCardProps {
   post: BlogPostItem;
@@ -15,9 +15,13 @@ export default function BlogCard({ post, categories, imageUrl, strapiBase }: Blo
     ? (author.avatar.url.startsWith('http') ? author.avatar.url : `${strapiBase}${author.avatar.url}`)
     : author?.avatarUrl || null;
 
+  const isKeyholding = post.serviceType === 'keyholding';
+
   return (
     <Link href={`/blog/${post.slug}`} className="block group">
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col group-hover:-translate-y-1">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full flex flex-col group-hover:-translate-y-0.5">
+        
+        {/* Picture Container with Service Tag on Top Left */}
         <div className="h-52 bg-slate-800 w-full overflow-hidden relative">
           {imageUrl ? (
             <img 
@@ -27,29 +31,48 @@ export default function BlogCard({ post, categories, imageUrl, strapiBase }: Blo
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-400 font-medium text-sm">
-              HouseForce Showcase
+              HouseForce Project Log
             </div>
           )}
+
+          {/* Service Tag on Top Left of Picture */}
+          <div className="absolute top-3 left-3 z-10">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold backdrop-blur-md shadow-sm ${
+              isKeyholding 
+                ? 'bg-slate-950/80 text-teal-300 border border-teal-500/30' 
+                : 'bg-slate-950/80 text-blue-200 border border-blue-400/30'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isKeyholding ? 'bg-teal-400' : 'bg-blue-400'}`} />
+              <span>{isKeyholding ? 'Keyholding' : 'Construction'}</span>
+            </span>
+          </div>
+
+          {/* Pinned Tag on Top Right of Picture */}
           {post.isPinned && (
-            <div className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-amber-400 text-slate-950 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
-              <Pin className="w-3 h-3 fill-slate-950" />
+            <div className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 bg-slate-950/80 backdrop-blur-md text-amber-300 border border-amber-400/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
+              <Pin className="w-3 h-3 fill-amber-300" />
               <span>Pinned</span>
             </div>
           )}
         </div>
         
+        {/* Card Body with Categories */}
         <div className="p-6 flex-grow flex flex-col justify-between">
           <div>
             {categories.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-2.5">
+              <div className="flex flex-wrap items-center gap-1.5 mb-3">
                 {categories.map((c) => (
-                  <span key={c.slug || c.name} className="text-[11px] font-bold text-blue-800 bg-blue-50/80 border border-blue-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <span 
+                    key={c.slug || c.name} 
+                    className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+                  >
                     {c.name}
                   </span>
                 ))}
               </div>
             )}
-            <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-900 transition-colors leading-snug">
+
+            <h4 className={`text-xl font-bold text-slate-900 mb-3 ${isKeyholding ? 'group-hover:text-teal-900' : 'group-hover:text-blue-900'} transition-colors leading-snug`}>
               {post.title}
             </h4>
             <p className="text-slate-600 text-sm font-light line-clamp-2 mb-4 leading-relaxed">
@@ -69,7 +92,7 @@ export default function BlogCard({ post, categories, imageUrl, strapiBase }: Blo
               <span>{new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
             )}
             
-            <span className="text-blue-900 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+            <span className={`${isKeyholding ? 'text-teal-800' : 'text-blue-900'} font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1`}>
               Read <ArrowRight className="w-3 h-3" />
             </span>
           </div>

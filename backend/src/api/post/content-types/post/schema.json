@@ -44,6 +44,18 @@
       "target": "api::author.author",
       "inversedBy": "posts"
     },
+    "serviceType": {
+      "type": "enumeration",
+      "enum": [
+        "construction",
+        "keyholding"
+      ],
+      "default": "construction"
+    },
+    "isAnchor": {
+      "type": "boolean",
+      "default": false
+    },
     "isPinned": {
       "type": "boolean",
       "default": false

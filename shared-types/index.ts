@@ -7,6 +7,8 @@ export interface Post {
   categories?: Category[];
   category?: Category; // Deprecated single category backward compatibility
   author?: Author;
+  serviceType?: 'construction' | 'keyholding';
+  isAnchor?: boolean;
   isPinned?: boolean;
   coverImage?: any; // Will refine based on Strapi upload type
   publishedAt: string;

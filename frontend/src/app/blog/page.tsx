@@ -1,7 +1,7 @@
 import { Link } from 'next-view-transitions';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Pin, Clock } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
-import HeroBlogCard from '@/components/blog/HeroBlogCard';
+import CategoryAnchorCard from '@/components/blog/CategoryAnchorCard';
 import BlogCard from '@/components/blog/BlogCard';
 
 interface StrapiAuthor {
@@ -22,6 +22,8 @@ interface StrapiPost {
   slug: string;
   content: string;
   createdAt: string;
+  serviceType?: 'construction' | 'keyholding';
+  isAnchor?: boolean;
   isPinned?: boolean;
   author?: StrapiAuthor;
   category?: StrapiCategory;
@@ -32,8 +34,11 @@ interface StrapiPost {
 async function getPosts() {
   try {
     const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
-    // Sort by isPinned:desc first, then createdAt:desc
-    const res = await fetch(`${strapiFetchUrl}/api/posts?sort[0]=isPinned:desc&sort[1]=createdAt:desc&populate=*`, { cache: 'no-store' });
+    // Sort by isAnchor:desc, isPinned:desc, then createdAt:desc
+    const res = await fetch(
+      `${strapiFetchUrl}/api/posts?sort[0]=isAnchor:desc&sort[1]=isPinned:desc&sort[2]=createdAt:desc&populate=*`, 
+      { cache: 'no-store' }
+    );
     if (!res.ok) throw new Error('Failed to fetch posts');
     return res.json();
   } catch (error) {
@@ -57,10 +62,11 @@ async function getCategories() {
 export default async function Blog({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; view?: string }>;
 }) {
   const resolvedParams = await searchParams;
   const activeCategory = resolvedParams.category?.toLowerCase() || 'all';
+  const activeView = resolvedParams.view?.toLowerCase() === 'pinned' ? 'pinned' : 'recent';
   const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
 
   const [postsRes, categoriesRes] = await Promise.all([
@@ -83,8 +89,11 @@ export default async function Blog({
     return cats;
   };
 
-  // Sort raw posts: pinned posts first, then newest first
+  // Sort posts: anchors first, then pinned posts, then chronological (most recent first)
   const posts = [...rawPosts].sort((a, b) => {
+    if (Boolean(a.isAnchor) !== Boolean(b.isAnchor)) {
+      return a.isAnchor ? -1 : 1;
+    }
     if (Boolean(a.isPinned) !== Boolean(b.isPinned)) {
       return a.isPinned ? -1 : 1;
     }
@@ -113,8 +122,7 @@ export default async function Blog({
     });
   });
 
-  // If a category was requested via search params (e.g. from service page icons),
-  // ensure it appears in the filter tabs even if no CMS posts have been published for it yet
+  // If a category was requested via search params, ensure it appears in filter tabs
   if (activeCategory !== 'all' && !dynamicCategoriesMap.has(activeCategory)) {
     const knownItem = [...constItems, ...keyItems].find(item => item.categorySlug === activeCategory);
     const label = knownItem 
@@ -128,7 +136,7 @@ export default async function Blog({
     ...Array.from(dynamicCategoriesMap.values())
   ];
 
-  // Filter posts by category if specified
+  // Filter posts by active category
   const filteredPosts = activeCategory === 'all'
     ? posts
     : posts.filter((post: StrapiPost) => {
@@ -151,8 +159,22 @@ export default async function Blog({
         return matchesCategory || titleText.includes(activeCategory);
       });
 
-  const featuredPost = filteredPosts.length > 0 ? filteredPosts[0] : null;
-  const remainingPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : [];
+  const currentCategoryObj = categories.find(c => c.slug === activeCategory);
+  const activeCategoryLabel = currentCategoryObj && currentCategoryObj.slug !== 'all' ? currentCategoryObj.label : undefined;
+
+  // The anchor page is shown as the hero piece at the top of the blog page when a filter is applied
+  const anchorPost = activeCategory !== 'all' 
+    ? filteredPosts.find((p) => p.isAnchor) || null 
+    : null;
+
+  // Candidate posts for the listing (excluding the anchor post if it is displayed in the hero)
+  const candidatePosts = anchorPost 
+    ? filteredPosts.filter((p) => p.id !== anchorPost.id) 
+    : filteredPosts;
+
+  // Split into pinned and chronological regular posts
+  const pinnedPosts = candidatePosts.filter((p) => p.isPinned);
+  const regularPosts = candidatePosts.filter((p) => !p.isPinned);
 
   const getImageUrl = (post: StrapiPost) => {
     if (!post?.coverImage?.url) return null;
@@ -161,51 +183,112 @@ export default async function Blog({
       : `${strapiBase}${post.coverImage.url}`;
   };
 
+  // Helper to build links preserving the active view
+  const getCategoryHref = (catSlug: string) => {
+    const base = catSlug === 'all' ? '/blog' : `/blog?category=${catSlug}`;
+    if (activeView === 'pinned') {
+      return catSlug === 'all' ? '/blog?view=pinned' : `${base}&view=pinned`;
+    }
+    return base;
+  };
+
+  const getViewHref = (viewMode: 'recent' | 'pinned') => {
+    if (activeCategory === 'all') {
+      return viewMode === 'pinned' ? '/blog?view=pinned' : '/blog';
+    }
+    return viewMode === 'pinned' 
+      ? `/blog?category=${activeCategory}&view=pinned` 
+      : `/blog?category=${activeCategory}`;
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-20 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Humble Page Header */}
-        <div className="mb-12 text-center sm:text-left border-b border-slate-200 pb-10">
+        {/* Editorial Page Header */}
+        <div className="mb-10 text-center sm:text-left border-b border-slate-200 pb-10">
           <span className="text-blue-900 text-xs font-bold uppercase tracking-widest block mb-2">
-            HouseForce Real Project Logs
+            {activeCategoryLabel ? `${activeCategoryLabel} • Project Logs & Standards` : 'HouseForce Project Logs'}
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Completed Projects &amp; Quality Evidence
+            {activeCategoryLabel ? `${activeCategoryLabel} in Costa Blanca` : 'Completed Projects & Quality Evidence'}
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl font-light leading-relaxed mb-8">
-            Real site photos, reform walkthroughs, and property care notes written directly by Paul, Paige, Skippy, and Jake.
+            {activeCategoryLabel 
+              ? `Real project walkthroughs, working standards, and site evidence for ${activeCategoryLabel.toLowerCase()} in Torrevieja.`
+              : 'Real site photos, reform walkthroughs, and property care notes written directly by Paul, Paige, Skippy, and Jake.'}
           </p>
 
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap gap-2 pt-2">
-            {categories.map((cat) => {
-              const isActive = activeCategory === cat.slug || (activeCategory === 'all' && cat.slug === 'all');
-              return (
-                <Link
-                  key={cat.slug}
-                  href={cat.slug === 'all' ? '/blog' : `/blog?category=${cat.slug}`}
-                  className={`text-xs font-bold px-4 py-2 rounded-full border transition-colors ${
-                    isActive 
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm' 
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
-                  }`}
-                >
-                  {cat.label}
-                </Link>
-              );
-            })}
+          {/* Category Filter Pills & View Toggles */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+            {/* Category Pills */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => {
+                const isActive = activeCategory === cat.slug || (activeCategory === 'all' && cat.slug === 'all');
+                return (
+                  <Link
+                    key={cat.slug}
+                    href={getCategoryHref(cat.slug)}
+                    className={`text-xs font-bold px-4 py-2 rounded-full border transition-colors ${
+                      isActive 
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-sm' 
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
+                    }`}
+                  >
+                    {cat.label}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* View Mode Toggle: Most Recent (default) vs All Pinned */}
+            <div className="flex items-center self-start md:self-auto bg-slate-200/80 p-1 rounded-full text-xs font-semibold shrink-0">
+              <Link
+                href={getViewHref('recent')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all ${
+                  activeView === 'recent'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>Most Recent</span>
+              </Link>
+              <Link
+                href={getViewHref('pinned')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all ${
+                  activeView === 'pinned'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Pin className="w-3.5 h-3.5" />
+                <span>All Pinned</span>
+              </Link>
+            </div>
           </div>
         </div>
 
+        {/* Category Anchor Hero: Only displayed when a category filter is applied */}
+        {anchorPost && (
+          <CategoryAnchorCard 
+            post={anchorPost}
+            categories={getPostCategories(anchorPost)}
+            imageUrl={getImageUrl(anchorPost)}
+            strapiBase={strapiBase}
+            categoryName={activeCategoryLabel || 'Service'}
+          />
+        )}
+
+        {/* Main Content Area */}
         {posts.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Showcases Posted Yet</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
             <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Showcases in This Category Yet</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs in This Category Yet</h3>
             <p className="text-slate-500 font-light text-sm mb-6">
               We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
             </p>
@@ -216,25 +299,76 @@ export default async function Blog({
               View All Showcases <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+        ) : activeView === 'pinned' ? (
+          /* "All Pinned" View State */
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <Pin className="w-4 h-4 text-blue-900" />
+              <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+                {activeCategory !== 'all' ? `Pinned ${activeCategoryLabel} Project Logs` : 'All Pinned Project Logs'}
+              </h3>
+            </div>
+
+            {pinnedPosts.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md mx-auto shadow-sm">
+                <p className="text-slate-500 font-light text-sm mb-4">No pinned project logs currently found in this category.</p>
+                <Link
+                  href={getViewHref('recent')}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 hover:underline"
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Switch back to Most Recent</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {pinnedPosts.map((post: StrapiPost) => (
+                  <BlogCard 
+                    key={post.id}
+                    post={post}
+                    categories={getPostCategories(post)}
+                    imageUrl={getImageUrl(post)}
+                    strapiBase={strapiBase}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         ) : (
-          <div className="space-y-16">
+          /* Default "Most Recent" View: Pinned Posts followed by Chronological Posts */
+          <div className="space-y-14">
             
-            {/* Hero / Highlight Card (Pinned post displayed first) */}
-            {featuredPost && (
-              <HeroBlogCard 
-                post={featuredPost}
-                categories={getPostCategories(featuredPost)}
-                imageUrl={getImageUrl(featuredPost)}
-                strapiBase={strapiBase}
-              />
+            {/* Pinned Posts: Highlighted after the anchor / top */}
+            {pinnedPosts.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-6">
+                  <Pin className="w-4 h-4 text-blue-900" />
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+                    {activeCategory !== 'all' ? `Highlighted ${activeCategoryLabel} Projects` : 'Highlighted Projects'}
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {pinnedPosts.map((post: StrapiPost) => (
+                    <BlogCard 
+                      key={post.id}
+                      post={post}
+                      categories={getPostCategories(post)}
+                      imageUrl={getImageUrl(post)}
+                      strapiBase={strapiBase}
+                    />
+                  ))}
+                </div>
+              </div>
             )}
 
-            {/* Remaining Posts Grid */}
-            {remainingPosts.length > 0 && (
+            {/* Standard Posts in Chronological Order */}
+            {regularPosts.length > 0 && (
               <div>
-                <h3 className="text-xl font-bold text-slate-900 mb-8 tracking-tight">More Project Showcases</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight">
+                  {activeCategory !== 'all' ? `More ${activeCategoryLabel} Project Logs` : 'Recent Project Logs & Updates'}
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {remainingPosts.map((post: StrapiPost) => (
+                  {regularPosts.map((post: StrapiPost) => (
                     <BlogCard 
                       key={post.id}
                       post={post}
