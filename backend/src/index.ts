@@ -146,24 +146,118 @@ export default {
           console.log(`[Strapi Bootstrap] Seeded client user: ${clientEmail}`);
         }
 
-        // 4. Ensure projects exist and are linked to the test client
-        const existingProjects = (await strapi.db.query('api::project.project').findMany({
-          populate: ['clients'],
-        })) as any[];
+        // 4. Ensure demo projects, updates, and messages exist and are linked to test client
+        const demoProjects = [
+          {
+            title: 'Modern Villa Renovation',
+            address: '123 Ocean Drive, Camps Bay',
+            projectStatus: 'in-progress',
+            updates: [
+              {
+                title: 'Foundation & Ground Floor Framing Completed',
+                content: 'The ground floor concrete foundation has cured completely, and structural steel framing is installed and signed off by the city engineer.',
+                date: '2026-09-01',
+                messages: [
+                  { authorType: 'staff' as const, staffName: 'Houseforce Staff', content: 'City building inspection signed off this morning with no defects.' },
+                  { authorType: 'client' as const, content: 'Excited to see this milestone reached! When do the exterior walls begin?' },
+                  { authorType: 'staff' as const, staffName: 'Houseforce Staff', content: 'Masonry work begins first thing Monday morning.' },
+                ],
+              },
+              {
+                title: 'Roof Trusses & Weatherproofing',
+                content: 'Roof trusses are fully erected and waterproof underlay membrane has been laid across all sections ahead of tile installation.',
+                date: '2026-09-08',
+                messages: [
+                  { authorType: 'staff' as const, staffName: 'Houseforce Staff', content: 'All skylight openings are flashed and sealed against weather.' },
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Luxury Penthouse Remodel',
+            address: '45 Marina Boulevard, Waterfront',
+            projectStatus: 'planning',
+            updates: [
+              {
+                title: 'Architectural Plans & Permitting',
+                content: 'Final architectural drawings and interior layouts submitted to the body corporate and municipal council for approval.',
+                date: '2026-09-10',
+                messages: [
+                  { authorType: 'client' as const, content: 'Have the expanded master suite revisions been included in the submission?' },
+                  { authorType: 'staff' as const, staffName: 'Houseforce Staff', content: 'Yes, the enlarged master suite and open kitchen layouts are fully included.' },
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Garden Studio & Pool Pavilion',
+            address: '18 Sunset Ridge, Constantia',
+            projectStatus: 'completed',
+            updates: [
+              {
+                title: 'Final Handover & Compliance Sign-Off',
+                content: 'All snag list items have been addressed, electrical compliance certificates issued, and keys handed over to the homeowner.',
+                date: '2026-08-28',
+                messages: [
+                  { authorType: 'staff' as const, staffName: 'Houseforce Staff', content: 'Thank you for working with Houseforce! Compliance certificates have been emailed.' },
+                  { authorType: 'client' as const, content: 'The pavilion looks absolutely incredible. Thank you to the whole Houseforce team!' },
+                ],
+              },
+            ],
+          },
+        ];
 
-        if (!existingProjects || existingProjects.length === 0) {
-          const newProject = await strapi.entityService.create('api::project.project', {
-            data: {
-              title: 'Modern Villa Renovation',
-              address: '123 Ocean Drive',
-              projectStatus: 'in-progress',
-              publishedAt: new Date(),
-              clients: testClient ? ([testClient.id] as any) : undefined,
-            },
+        for (const demo of demoProjects) {
+          const existing = await strapi.db.query('api::project.project').findOne({
+            where: { title: demo.title },
           });
-          console.log(`[Strapi Bootstrap] Seeded test project: #${newProject.id}`);
-        } else if (testClient) {
-          for (const project of existingProjects) {
+
+          if (!existing) {
+            const newProject = await strapi.entityService.create('api::project.project', {
+              data: {
+                title: demo.title,
+                address: demo.address,
+                projectStatus: demo.projectStatus as any,
+                publishedAt: new Date(),
+                clients: testClient ? ([testClient.id] as any) : undefined,
+              },
+            });
+            console.log(`[Strapi Bootstrap] Seeded project: "${demo.title}" (#${newProject.id})`);
+
+            for (const upd of demo.updates) {
+              const createdUpdate = await strapi.entityService.create('api::update.update', {
+                data: {
+                  title: upd.title,
+                  content: upd.content,
+                  date: upd.date,
+                  project: newProject.id,
+                  publishedAt: new Date(),
+                  clientNotified: true,
+                },
+              });
+
+              for (const msg of upd.messages) {
+                await strapi.entityService.create('api::update-message.update-message', {
+                  data: {
+                    content: msg.content,
+                    authorType: msg.authorType,
+                    staffName: msg.authorType === 'staff' ? msg.staffName : undefined,
+                    clientAuthor: msg.authorType === 'client' && testClient ? testClient.id : undefined,
+                    update: createdUpdate.id,
+                  },
+                });
+              }
+            }
+          }
+        }
+
+        // Ensure test client is linked across ALL existing project records in the database
+        if (testClient) {
+          const allProjects = (await strapi.db.query('api::project.project').findMany({
+            populate: ['clients'],
+          })) as any[];
+
+          for (const project of allProjects) {
             const hasClient = project.clients?.some((c: any) => c.id === testClient.id);
             if (!hasClient) {
               const currentClientIds = project.clients?.map((c: any) => c.id) || [];
