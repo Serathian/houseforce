@@ -234,20 +234,22 @@ export default function KeyholdingPage() {
         <div ref={scrollRef} className={`absolute bottom-0 w-full bg-white/10 backdrop-blur-md border-t border-white/20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-30 ${isScrollable ? 'overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]' : 'overflow-hidden'}`}>
           <div className={`relative min-w-max px-6 py-3 md:py-4 flex flex-row items-start gap-6 md:gap-10 lg:gap-12 mx-auto ${isScrollable ? 'justify-start' : 'justify-center'}`}>
             {(isScrollable ? [...keyItems, ...keyItems, ...keyItems] : keyItems).map((item, i) => (
-              <div 
+              <Link 
                 key={i} 
-                className="flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-default select-none pointer-events-auto"
+                href={`/blog?category=${item.categorySlug}`}
+                className="flex flex-col items-center flex-shrink-0 w-[84px] md:w-[110px] group cursor-pointer select-none pointer-events-auto transition-transform hover:-translate-y-1 focus:outline-none"
+                title={`View project showcases for ${item.label}`}
               >
                 <div 
-                  className="w-12 h-12 bg-teal-800 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-teal-100 transition-all duration-300"
+                  className="w-12 h-12 bg-teal-800 group-hover:bg-teal-600 group-hover:shadow-teal-500/50 rounded-full shrink-0 shadow-lg border-2 border-white flex items-center justify-center text-teal-100 group-hover:text-white transition-all duration-300"
                   style={{ viewTransitionName: i < keyItems.length ? `circle-key-${i}` : 'none' }}
                 >
-                  <div className="w-5 h-5 flex items-center justify-center">
+                  <div className="w-5 h-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
                     {item.icon}
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-white mt-2.5 uppercase tracking-wider opacity-85 transition-colors text-center max-w-full drop-shadow-md leading-tight">{item.label}</span>
-              </div>
+                <span className="text-[11px] font-bold text-white group-hover:text-amber-300 mt-2.5 uppercase tracking-wider opacity-85 group-hover:opacity-100 transition-colors text-center max-w-full drop-shadow-md leading-tight">{item.label}</span>
+              </Link>
             ))}
           </div>
         </div>
