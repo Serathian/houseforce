@@ -81,6 +81,9 @@
     "hasCompletedNotificationOnboarding": {
       "type": "boolean",
       "default": false
+    },
+    "readNotificationIds": {
+      "type": "json"
     }
   }
 }

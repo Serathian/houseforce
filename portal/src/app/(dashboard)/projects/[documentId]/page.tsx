@@ -6,6 +6,9 @@ import { Link } from 'next-view-transitions';
 import { ArrowLeft, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { UpdateThread } from "@/components/UpdateThread";
+import ProjectUnreadBanner from "@/components/ProjectUnreadBanner";
+import ProjectUnreadBadge from "@/components/ProjectUnreadBadge";
+import UpdateUnreadIndicator from "@/components/UpdateUnreadIndicator";
 
 interface UpdateMessage {
   id: number;
@@ -134,6 +137,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         Back to Dashboard
       </Link>
 
+      {/* Project Unread Banner */}
+      <ProjectUnreadBanner projectDocumentId={project.documentId} />
+
       {/* Project Header */}
       <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200 mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
@@ -144,7 +150,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               {project.address || "No address specified"}
             </div>
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-3 flex-wrap">
+            <ProjectUnreadBadge projectDocumentId={project.documentId} />
             <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest ${
               project.projectStatus === 'in-progress' ? 'bg-amber-100 text-amber-800' :
               project.projectStatus === 'completed' ? 'bg-emerald-100 text-emerald-800' :
@@ -191,9 +198,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 hover:shadow-md transition-shadow group">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                  <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-900 transition-colors">
-                    {update.title}
-                  </h3>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-900 transition-colors">
+                      {update.title}
+                    </h3>
+                    <UpdateUnreadIndicator
+                      updateId={update.id}
+                      messageIds={update.messages?.map((m) => m.id)}
+                    />
+                  </div>
                   <span className="flex items-center text-sm font-semibold text-slate-400 bg-slate-50 px-3 py-1 rounded-full w-fit">
                     <Calendar className="w-4 h-4 mr-2" />
                     {format(parseISO(update.date || update.createdAt), 'MMMM d, yyyy')}
