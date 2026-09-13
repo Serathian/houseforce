@@ -1,0 +1,48 @@
+# Agent Guidelines: HouseForce Monorepo
+
+Welcome, AI agent! This document contains the operational principles, architecture contracts, and development practices required when working on the **HouseForce Monorepo**.
+
+---
+
+## 1. Monorepo Structure & Sibling Guides
+
+Each subproject has a specialized `AGENTS.md` with domain-specific rules:
+
+* **[`backend/AGENTS.md`](./backend/AGENTS.md)**: Strapi 5 headless CMS, schemas, lifecycles, email service desk, and test suite.
+* **[`portal/AGENTS.md`](./portal/AGENTS.md)**: Customer portal (Next.js 16 App Router), NextAuth OAuth & JWT session handling, timeline, and `UpdateThread`.
+* **[`frontend/AGENTS.md`](./frontend/AGENTS.md)**: Marketing website (Next.js), brand styling, Tailwind CSS v4, Framer Motion animations.
+* **[`bruno/AGENTS.md`](./bruno/AGENTS.md)**: Bruno API test collections and automated webhook simulation.
+
+---
+
+## 2. Core Architectural Principles
+
+### Security & Secrets Hygiene
+* **Never commit `.env` or `.env*.local`**: Always preserve the root `.gitignore`. Environment templates belong in `.env.example` or `portal/.env.example` with placeholder values only.
+* **Preserve Multi-Tenant Isolation**: Customers must NEVER see or write to projects, updates, or update messages belonging to other clients.
+  * In Strapi controllers, always scope queries via `clients: user.id`.
+  * Always short-circuit empty result sets: if `allowedProjects.length === 0`, return `{ data: [], meta: { pagination: { total: 0 } } }` immediately to avoid SQL `WHERE id IN ()` syntax errors.
+
+### Docker & Environment Strategy
+* **Explicit Compose Split**:
+  * [`docker-compose.yml`](./docker-compose.yml): Production base containing only `backend`, `frontend`, and `portal` in standalone runner mode, reading cloud database/S3 environment variables.
+  * [`docker-compose.local.yml`](./docker-compose.local.yml): Local development overrides adding PostgreSQL (`db`), MinIO local S3 (`minio`), volume mounts for hot reloading, and dev flags (`SEED_TEST_DATA`, `NEXT_PUBLIC_ENABLE_DEV_LOGIN`).
+* **Starting the Stack Locally**:
+  ```bash
+  docker compose -f docker-compose.yml -f docker-compose.local.yml up
+  ```
+
+### Authentication & Provider Handshake
+* Production customer portal accounts are **invitation-only**: Strapi admin creates the user with email; the lifecycle hook sets `provider = provider || 'google'`.
+* NextAuth authenticates with Google -> exchanges Google token at Strapi's `/api/auth/google/callback` -> receives Strapi JWT.
+* Local development includes a credentials provider (`client@example.com` / `password123`) enabled when `NEXT_PUBLIC_ENABLE_DEV_LOGIN=true`.
+
+---
+
+## 3. Verification & Testing Commands
+
+Before completing any task or proposing commits:
+
+1. **Backend Tests**: Run `npm --prefix backend test` (executes `tsc --noEmit` and all 24 native tests).
+2. **Compose Validation**: Run `docker compose -f docker-compose.yml -f docker-compose.local.yml config --quiet`.
+3. **Git Hygiene**: Run `git status` to ensure no temporary scratch files or untracked `.env` files are left behind.

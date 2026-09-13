@@ -1,61 +1,46 @@
-# 🚀 Getting started with Strapi
+# HouseForce Backend (Strapi 5 Headless CMS)
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
-
-### `develop`
-
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
-
-```
-npm run develop
-# or
-yarn develop
-```
-
-### `start`
-
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
-
-```
-npm run start
-# or
-yarn start
-```
-
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
-
-```
-npm run build
-# or
-yarn build
-```
-
-## ⚙️ Deployment
-
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
-
-```
-yarn strapi deploy
-```
-
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
+The backend service is built on [Strapi 5](https://strapi.io/) with TypeScript, providing headless REST endpoints for the marketing frontend and customer portal, automated email service desk integration, and multi-tenant access control.
 
 ---
 
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+## Content Types & Schemas
+
+| Content Type | UID | Description | Relations & Roles |
+| :--- | :--- | :--- | :--- |
+| **Project** | `api::project.project` | Customer renovation, construction, or keyholding project. | Many-to-Many `clients` (`users-permissions.user`), One-to-Many `updates`. |
+| **Project Update** | `api::update.update` | Milestone update, site log entry, or timeline event. | Many-to-One `project`, One-to-Many `messages` (`update-message`), Multiple `images` (media). |
+| **Update Message** | `api::update-message.update-message` | Threaded discussion reply to an update (from client or staff). | Many-to-One `update`, `authorType: 'staff' \| 'client'`, optional `clientAuthor`. |
+| **Post** | `api::post.post` | Public marketing blog articles. | Many-to-Many `categories`. |
+| **Category** | `api::category.category` | Service categories and blog tags. | Many-to-Many `posts`. |
+
+---
+
+## Key Modules & Subsystems
+
+1. **Multi-Tenant Access Control**:
+   * [`src/api/project/controllers/project.ts`](./src/api/project/controllers/project.ts) and [`src/api/update/controllers/update.ts`](./src/api/update/controllers/update.ts): Overrides `find` and `findOne` to strictly restrict records to the authenticated user (`clients: user.id`).
+   * [`src/api/update-message/controllers/update-message.ts`](./src/api/update-message/controllers/update-message.ts): Verifies project ownership before allowing clients to read or post messages.
+2. **Email Service Desk ([`src/services/email-service.ts`](./src/services/email-service.ts))**:
+   * Outbound emails sent via `@strapi/provider-email-nodemailer` (Postmark SMTP).
+   * Generates custom threading headers (`Message-ID`, `In-Reply-To`, `References`, `Reply-To: update-<id>@replies.houseforce.com`).
+3. **Inbound Email Webhook ([`src/api/webhook/controllers/inbound-email.ts`](./src/api/webhook/controllers/inbound-email.ts))**:
+   * Public webhook endpoint (`POST /webhooks/inbound-email`) receiving incoming Postmark/SendGrid emails.
+   * Parses stripped body and appends replies as `update-message` entries.
+4. **Media Upload Provider**:
+   * Configured with `@strapi/provider-upload-aws-s3` targeting MinIO locally and AWS S3 / DigitalOcean Spaces in production.
+
+---
+
+## Local Development & Testing
+
+```bash
+# Typecheck and run all 24 native unit & lifecycle tests
+npm test
+
+# Run TypeScript check only
+npm run typecheck
+
+# Start Strapi in development mode (requires local PostgreSQL)
+npm run develop
+```
