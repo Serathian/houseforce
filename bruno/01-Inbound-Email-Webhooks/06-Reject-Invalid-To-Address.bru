@@ -1,0 +1,30 @@
+meta {
+  name: Inbound: Reject Invalid To Address
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/webhooks/inbound-email
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "From": "{{staffEmail}}",
+    "To": "unsupported-mailbox@replies.houseforce.com",
+    "Subject": "Hello",
+    "TextBody": "This should be rejected because destination is neither project-* nor update-*"
+  }
+}
+
+tests {
+  test("status is 400 Bad Request", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

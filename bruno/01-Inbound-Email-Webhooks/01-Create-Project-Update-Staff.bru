@@ -1,0 +1,45 @@
+meta {
+  name: Inbound: Staff Creates Project Update
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/webhooks/inbound-email
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "From": "John Staff <{{staffEmail}}>",
+    "To": "Houseforce Updates <project-{{projectId}}@replies.houseforce.com>",
+    "Subject": "Foundation & Framing Completed",
+    "TextBody": "The ground floor framing is completed. Inspection is scheduled for next week.\n\nBest,\nJohn",
+    "StrippedTextReply": "The ground floor framing is completed. Inspection is scheduled for next week."
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("success is true", function() {
+    expect(res.getBody().success).to.equal(true);
+  });
+
+  test("returns new update ID", function() {
+    expect(res.getBody().data.updateId).to.be.a('number');
+  });
+}
+
+script:post-response {
+  if (res.getBody().data && res.getBody().data.updateId) {
+    bru.setVar("updateId", res.getBody().data.updateId);
+  }
+}

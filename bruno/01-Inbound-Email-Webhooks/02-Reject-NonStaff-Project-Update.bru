@@ -1,0 +1,30 @@
+meta {
+  name: Inbound: Reject Non-Staff Project Update
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/webhooks/inbound-email
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "From": "unauthorized_user@gmail.com",
+    "To": "project-{{projectId}}@replies.houseforce.com",
+    "Subject": "Attempted Update",
+    "TextBody": "This should be rejected because sender is not an active staff admin."
+  }
+}
+
+tests {
+  test("status is 403 Forbidden", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

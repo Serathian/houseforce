@@ -1,0 +1,112 @@
+name: CI - Tests & API Checks
+
+on:
+  push:
+    branches:
+      - main
+      - email-chain
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Backend Unit & Lifecycle Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run native unit tests
+        working-directory: ./backend
+        run: npm test
+
+  api-tests-bruno:
+    name: API Tests (Bruno CLI)
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: strapi
+          POSTGRES_USER: strapi
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build Strapi
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Start Strapi Backend (Seeded Test Environment)
+        working-directory: ./backend
+        env:
+          DATABASE_CLIENT: postgres
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: strapi
+          DATABASE_USERNAME: strapi
+          DATABASE_PASSWORD: password
+          DATABASE_SSL: "false"
+          NODE_ENV: development
+          SEED_TEST_DATA: "true"
+          APP_KEYS: testKey1,testKey2
+          API_TOKEN_SALT: testSalt
+          ADMIN_JWT_SECRET: testAdminJwtSecret
+          TRANSFER_TOKEN_SALT: testTransferTokenSalt
+          JWT_SECRET: testJwtSecret1234567890
+          EMAIL_DOMAIN: replies.houseforce.com
+          EMAIL_DEFAULT_FROM: updates@replies.houseforce.com
+          POSTMARK_API_TOKEN: mock-test-token
+        run: |
+          npm run develop &
+          echo "Waiting for Strapi API to be ready..."
+          timeout 120 bash -c 'until curl -sf http://localhost:1337/_health > /dev/null; do sleep 2; done'
+          echo "Strapi is online and healthy!"
+
+      - name: Run Bruno CLI Collection
+        working-directory: ./bruno
+        run: |
+          npx -y @usebruno/cli run -r --env Local --reporter-junit ../bruno-report.xml
+
+      - name: Upload Bruno Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruno-test-report
+          path: bruno-report.xml

@@ -1,0 +1,30 @@
+meta {
+  name: Inbound: Reject Empty Body
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/webhooks/inbound-email
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "From": "{{staffEmail}}",
+    "To": "project-{{projectId}}@replies.houseforce.com",
+    "Subject": "Empty message",
+    "TextBody": "   "
+  }
+}
+
+tests {
+  test("status is 400 Bad Request", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

@@ -1,0 +1,39 @@
+meta {
+  name: Inbound: Staff Reply to Update Thread
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/webhooks/inbound-email
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "From": "John Staff <{{staffEmail}}>",
+    "To": "update-{{updateId}}@replies.houseforce.com",
+    "Subject": "Re: Project Update",
+    "TextBody": "Yes, windows are scheduled for delivery on Thursday morning.",
+    "StrippedTextReply": "Yes, windows are scheduled for delivery on Thursday morning."
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("success is true", function() {
+    expect(res.getBody().success).to.equal(true);
+  });
+
+  test("returns recorded message ID", function() {
+    expect(res.getBody().data.messageId).to.be.a('number');
+  });
+}
