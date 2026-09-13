@@ -35,6 +35,7 @@ This guide outlines rules and architectural patterns for agents modifying or ext
 
 ## 4. Testing & Verification
 
-* Always run `npm test` before concluding your changes.
+* Always run `npm test` (or `npm test -w backend` from monorepo root) before concluding your changes.
 * Tests run using Node's native test runner (`node --test tests/*.test.ts`) with `--import ./tests/register-loader.mjs`.
+* Run `npm run typecheck -w backend` to ensure no TypeScript compilation issues.
 * When adding new service methods or controllers, add corresponding unit tests in `tests/` leveraging the lightweight `mock-strapi.ts` fixture.

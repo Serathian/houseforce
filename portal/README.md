@@ -39,11 +39,27 @@ STRAPI_INTERNAL_URL=http://backend:1337
 NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
 ```
 
-## Running Locally
+## Running Locally & Commands
 
+### Monorepo Stack
 To run the portal along with the full local stack (Postgres, Strapi, MinIO S3):
-
 ```bash
 # From repository root
-docker compose -f docker-compose.yml -f docker-compose.local.yml up
+npm run dev
+# Or: docker compose -f docker-compose.yml -f docker-compose.local.yml up
+```
+
+### Standalone Portal Commands
+```bash
+# From repository root:
+npm run dev:portal         # Run Next.js portal development server on port 3001
+npm run build:portal       # Build production standalone package
+npm run lint:portal        # Run ESLint on portal
+npm run typecheck:portal   # Run TypeScript check
+
+# From portal/ directory:
+npm run dev                # Run development server on port 3001
+npm run build              # Build production package
+npm run lint               # Run ESLint
+npm run typecheck          # Run TypeScript check
 ```

@@ -27,3 +27,12 @@ This guide outlines rules and architectural patterns for agents modifying or ext
   * Server-side data fetching uses `process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'`.
   * Client-side requests must use `process.env.NEXT_PUBLIC_STRAPI_URL`.
   * Fallbacks must be provided so the static landing pages render gracefully even if the Strapi backend is not currently running.
+
+---
+
+## 3. Verification & Testing
+
+Before concluding changes to `frontend`:
+* Run `npm run typecheck:frontend` (or `npm run typecheck -w frontend`).
+* Run `npm run lint:frontend` (or `npm run lint -w frontend`).
+* Run `npm run build:frontend` (or `npm run build -w frontend`) to ensure production Next.js compilation succeeds.

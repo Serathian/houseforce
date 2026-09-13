@@ -11,11 +11,25 @@ Each subproject has a specialized `AGENTS.md` with domain-specific rules:
 * **[`backend/AGENTS.md`](./backend/AGENTS.md)**: Strapi 5 headless CMS, schemas, lifecycles, email service desk, and test suite.
 * **[`portal/AGENTS.md`](./portal/AGENTS.md)**: Customer portal (Next.js 16 App Router), NextAuth OAuth & JWT session handling, timeline, and `UpdateThread`.
 * **[`frontend/AGENTS.md`](./frontend/AGENTS.md)**: Marketing website (Next.js), brand styling, Tailwind CSS v4, Framer Motion animations.
+* **[`shared-types/AGENTS.md`](./shared-types/AGENTS.md)**: Shared TypeScript contracts and interfaces (`@houseforce/shared-types`).
 * **[`bruno/AGENTS.md`](./bruno/AGENTS.md)**: Bruno API test collections and automated webhook simulation.
 
 ---
 
 ## 2. Core Architectural Principles
+
+### NPM Workspaces Strategy
+* The repository is configured as an npm workspace managing `backend`, `frontend`, `portal`, and `shared-types`.
+* **Dependency Hoisting & Isolation**:
+  * Shared dependencies are hoisted to root `node_modules/`.
+  * Version-specific dependencies (e.g. React 18 in Strapi backend vs React 19 in Next.js portal/frontend) are nested in subpackage `node_modules/`.
+  * Always install new packages using workspace flags:
+    ```bash
+    npm install <package> -w <workspace-name>
+    # Example: npm install zod -w portal
+    ```
+* **Unified & Scoped Commands**:
+  * Monorepo tasks can be run globally (`npm test`, `npm run typecheck`, `npm run lint`, `npm run build`) or scoped (`npm run dev:portal`, `npm run build:frontend`, `npm test -w backend`).
 
 ### Security & Secrets Hygiene
 * **Never commit `.env` or `.env*.local`**: Always preserve the root `.gitignore`. Environment templates belong in `.env.example` or `portal/.env.example` with placeholder values only.
@@ -29,7 +43,8 @@ Each subproject has a specialized `AGENTS.md` with domain-specific rules:
   * [`docker-compose.local.yml`](./docker-compose.local.yml): Local development overrides adding PostgreSQL (`db`), MinIO local S3 (`minio`), volume mounts for hot reloading, and dev flags (`SEED_TEST_DATA`, `NEXT_PUBLIC_ENABLE_DEV_LOGIN`).
 * **Starting the Stack Locally**:
   ```bash
-  docker compose -f docker-compose.yml -f docker-compose.local.yml up
+  npm run dev
+  # Or: docker compose -f docker-compose.yml -f docker-compose.local.yml up
   ```
 
 ### Authentication & Provider Handshake
@@ -43,6 +58,8 @@ Each subproject has a specialized `AGENTS.md` with domain-specific rules:
 
 Before completing any task or proposing commits:
 
-1. **Backend Tests**: Run `npm --prefix backend test` (executes `tsc --noEmit` and all 24 native tests).
-2. **Compose Validation**: Run `docker compose -f docker-compose.yml -f docker-compose.local.yml config --quiet`.
-3. **Git Hygiene**: Run `git status` to ensure no temporary scratch files or untracked `.env` files are left behind.
+1. **Backend Tests**: Run `npm test` (or `npm test -w backend`).
+2. **Typecheck**: Run `npm run typecheck` across all workspaces.
+3. **Lint**: Run `npm run lint` across all workspaces.
+4. **Compose Validation**: Run `docker compose -f docker-compose.yml -f docker-compose.local.yml config --quiet`.
+5. **Git Hygiene**: Run `git status` to ensure no temporary scratch files or untracked `.env` files are left behind.

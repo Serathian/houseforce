@@ -20,9 +20,9 @@ The Bruno collection tests the integration contracts between the email service d
   cd bruno
   npx -y @usebruno/cli run -r --env Local
   ```
-* **Via Backend NPM Script**:
+* **Via Root Monorepo NPM Script**:
   ```bash
-  npm --prefix backend run test:api
+  npm run test:api
   ```
 * **Via GUI (Flatpak)**:
   ```bash

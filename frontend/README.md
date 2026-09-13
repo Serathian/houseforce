@@ -24,12 +24,18 @@ The **HouseForce Marketing Website** is the public web presence for HouseForce, 
 
 ---
 
-## Local Development
+## Local Development & Commands
 
 ```bash
-# Run standalone frontend on port 3000
-npm run dev
+# From repository root:
+npm run dev:frontend       # Run Next.js marketing development server on port 3000
+npm run build:frontend     # Build production standalone package
+npm run lint:frontend      # Run ESLint on frontend
+npm run typecheck:frontend # Check TypeScript types
 
-# Build production standalone package
-npm run build
+# From frontend/ directory:
+npm run dev                # Run standalone frontend on port 3000
+npm run build              # Build production standalone package
+npm run lint               # Run ESLint
+npm run typecheck          # Run TypeScript check
 ```

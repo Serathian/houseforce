@@ -39,3 +39,12 @@ This guide outlines rules and architectural patterns for agents modifying or ext
 * **Support CTA ([`src/components/SupportCTA.tsx`](./src/components/SupportCTA.tsx))**:
   * The modal popup dialog must remain mountable for logged-in users when opened via [`SupportTriggerButton`](./src/components/SupportTriggerButton.tsx) on the dashboard empty state.
   * The persistent floating launcher button ("Need Help?") is only shown when unauthenticated to prevent overlapping the mobile navigation pill.
+
+---
+
+## 4. Verification & Testing
+
+Before concluding changes to `portal`:
+* Run `npm run typecheck:portal` (or `npm run typecheck -w portal`).
+* Run `npm run lint:portal` (or `npm run lint -w portal`).
+* Run `npm run build:portal` (or `npm run build -w portal`) to ensure production Next.js compilation succeeds.
