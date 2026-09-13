@@ -43,6 +43,10 @@
       "relation": "manyToOne",
       "target": "api::author.author",
       "inversedBy": "posts"
+    },
+    "isPinned": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

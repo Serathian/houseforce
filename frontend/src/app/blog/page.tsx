@@ -1,6 +1,8 @@
 import { Link } from 'next-view-transitions';
-import { ArrowRight, Calendar, Tag } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
+import HeroBlogCard from '@/components/blog/HeroBlogCard';
+import BlogCard from '@/components/blog/BlogCard';
 
 interface StrapiAuthor {
   name: string;
@@ -20,6 +22,7 @@ interface StrapiPost {
   slug: string;
   content: string;
   createdAt: string;
+  isPinned?: boolean;
   author?: StrapiAuthor;
   category?: StrapiCategory;
   categories?: StrapiCategory[];
@@ -29,7 +32,8 @@ interface StrapiPost {
 async function getPosts() {
   try {
     const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
-    const res = await fetch(`${strapiFetchUrl}/api/posts?populate=*`, { cache: 'no-store' });
+    // Sort by isPinned:desc first, then createdAt:desc
+    const res = await fetch(`${strapiFetchUrl}/api/posts?sort[0]=isPinned:desc&sort[1]=createdAt:desc&populate=*`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch posts');
     return res.json();
   } catch (error) {
@@ -64,7 +68,7 @@ export default async function Blog({
     getCategories()
   ]);
 
-  const posts = postsRes.data || [];
+  const rawPosts: StrapiPost[] = postsRes.data || [];
   const cmsCategoriesRaw = categoriesRes.data || [];
 
   // Helper to extract all categories assigned to a post
@@ -78,6 +82,14 @@ export default async function Blog({
     }
     return cats;
   };
+
+  // Sort raw posts: pinned posts first, then newest first
+  const posts = [...rawPosts].sort((a, b) => {
+    if (Boolean(a.isPinned) !== Boolean(b.isPinned)) {
+      return a.isPinned ? -1 : 1;
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
   // Dynamically build category facets from CMS categories API & post data
   const dynamicCategoriesMap = new Map<string, { label: string; slug: string }>();
@@ -207,52 +219,14 @@ export default async function Blog({
         ) : (
           <div className="space-y-16">
             
-            {/* Featured Post Card */}
+            {/* Hero / Highlight Card (Pinned post displayed first) */}
             {featuredPost && (
-              <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                <Link href={`/blog/${featuredPost.slug}`} className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                  <div className="lg:col-span-7 h-64 sm:h-80 lg:h-auto bg-slate-900 relative overflow-hidden">
-                    {getImageUrl(featuredPost) ? (
-                      <img 
-                        src={getImageUrl(featuredPost)!} 
-                        alt={featuredPost.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400 font-medium">
-                        HouseForce Showcase
-                      </div>
-                    )}
-                  </div>
-                  <div className="lg:col-span-5 p-8 sm:p-10 flex flex-col justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-4">
-                        {getPostCategories(featuredPost).map((cat) => (
-                          <span key={cat.slug || cat.name} className="inline-flex items-center gap-1 text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">
-                            <Tag className="w-3 h-3 text-blue-700" />
-                            {cat.name}
-                          </span>
-                        ))}
-                        <span className="text-xs text-slate-400 font-medium inline-flex items-center gap-1 ml-auto sm:ml-0">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {new Date(featuredPost.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4 group-hover:text-blue-900 transition-colors leading-tight">
-                        {featuredPost.title}
-                      </h2>
-                      <p className="text-slate-600 text-sm sm:text-base line-clamp-3 font-light leading-relaxed mb-6">
-                        {featuredPost.content || 'Click to view full project details and photos.'}
-                      </p>
-                    </div>
-
-                    <div className="inline-flex items-center gap-2 text-blue-900 font-bold text-sm group-hover:translate-x-1 transition-transform">
-                      <span>Read Project Showcase</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </Link>
-              </div>
+              <HeroBlogCard 
+                post={featuredPost}
+                categories={getPostCategories(featuredPost)}
+                imageUrl={getImageUrl(featuredPost)}
+                strapiBase={strapiBase}
+              />
             )}
 
             {/* Remaining Posts Grid */}
@@ -260,51 +234,15 @@ export default async function Blog({
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-8 tracking-tight">More Project Showcases</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {remainingPosts.map((post: StrapiPost) => {
-                    const coverUrl = getImageUrl(post);
-                    const postCategories = getPostCategories(post);
-                    return (
-                      <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
-                        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col group-hover:-translate-y-1">
-                          <div className="h-48 bg-slate-800 w-full overflow-hidden relative">
-                            {coverUrl ? (
-                              <img 
-                                src={coverUrl} 
-                                alt={post.title} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-slate-400 font-medium text-sm">
-                                HouseForce Showcase
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-6 flex-grow flex flex-col justify-between">
-                            <div>
-                              {postCategories.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 mb-2">
-                                  {postCategories.map((c) => (
-                                    <span key={c.slug || c.name} className="text-[11px] font-bold text-blue-800 bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                                      {c.name}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-900 transition-colors leading-snug">
-                                {post.title}
-                              </h4>
-                            </div>
-                            <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-slate-400 text-xs font-medium">
-                              <span>{new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                              <span className="text-blue-900 font-bold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
-                                Read <ArrowRight className="w-3 h-3" />
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                  {remainingPosts.map((post: StrapiPost) => (
+                    <BlogCard 
+                      key={post.id}
+                      post={post}
+                      categories={getPostCategories(post)}
+                      imageUrl={getImageUrl(post)}
+                      strapiBase={strapiBase}
+                    />
+                  ))}
                 </div>
               </div>
             )}

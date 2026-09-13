@@ -7,6 +7,7 @@ export interface Post {
   categories?: Category[];
   category?: Category; // Deprecated single category backward compatibility
   author?: Author;
+  isPinned?: boolean;
   coverImage?: any; // Will refine based on Strapi upload type
   publishedAt: string;
   createdAt: string;
