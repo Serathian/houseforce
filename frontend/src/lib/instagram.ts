@@ -138,34 +138,42 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
       return [];
     }
 
-    const payload: InstagramApiResponse = await res.json();
+    const payload = await res.json();
 
     if (payload.error) {
       console.warn('[Instagram Feed] API returned error:', payload.error.message);
       return [];
     }
 
-    if (!payload.data || !Array.isArray(payload.data) || payload.data.length === 0) {
+    const items: any[] = Array.isArray(payload) 
+      ? payload 
+      : (payload.data && Array.isArray(payload.data) ? payload.data : []);
+
+    if (items.length === 0) {
       return [];
     }
 
     // Transform live Instagram items to InstagramPost interface
-    const transformedPosts: InstagramPost[] = payload.data
-      .filter((item) => item.media_url || item.thumbnail_url)
+    const transformedPosts: InstagramPost[] = items
+      .filter((item) => item.media_url || item.mediaUrl || item.thumbnail_url || item.thumbnailUrl)
       .map((item, index) => {
-        const imageUrl = item.media_type === 'VIDEO' 
-          ? (item.thumbnail_url || item.media_url || '') 
-          : (item.media_url || '');
+        const rawMediaUrl = item.media_url || item.mediaUrl || '';
+        const rawThumbnailUrl = item.thumbnail_url || item.thumbnailUrl || '';
+        const mediaType = (item.media_type || item.mediaType || '').toUpperCase();
 
-        const { title, tag, cleanCaption } = parsePostContent(item.caption);
+        const imageUrl = mediaType === 'VIDEO'
+          ? (rawThumbnailUrl || rawMediaUrl)
+          : (rawMediaUrl || rawThumbnailUrl);
+
+        const { title, tag, cleanCaption } = parsePostContent(item.caption || '');
 
         return {
           id: item.id || `live-ig-${index}`,
           title,
           imageUrl,
           caption: cleanCaption,
-          likes: typeof item.like_count === 'number' ? item.like_count : 0,
-          comments: typeof item.comments_count === 'number' ? item.comments_count : 0,
+          likes: typeof item.like_count === 'number' ? item.like_count : (typeof item.likeCount === 'number' ? item.likeCount : 0),
+          comments: typeof item.comments_count === 'number' ? item.comments_count : (typeof item.commentsCount === 'number' ? item.commentsCount : 0),
           permalink: item.permalink || 'https://www.instagram.com/houseforcespain',
           timestamp: formatRelativeTime(item.timestamp),
           tag,
