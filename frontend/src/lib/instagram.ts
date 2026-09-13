@@ -33,24 +33,20 @@ export const defaultInstagramProfile: InstagramProfile = {
 };
 
 interface RawInstagramMediaItem {
-  id: string;
+  id?: string;
   caption?: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type?: string;
+  mediaType?: string;
   media_url?: string;
+  mediaUrl?: string;
   thumbnail_url?: string;
+  thumbnailUrl?: string;
   permalink?: string;
   timestamp?: string;
   like_count?: number;
+  likeCount?: number;
   comments_count?: number;
-}
-
-interface InstagramApiResponse {
-  data?: RawInstagramMediaItem[];
-  error?: {
-    message: string;
-    type: string;
-    code: number;
-  };
+  commentsCount?: number;
 }
 
 function formatRelativeTime(timestampStr?: string): string {
@@ -138,14 +134,17 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
       return [];
     }
 
-    const payload = await res.json();
+    const payload = (await res.json()) as {
+      data?: RawInstagramMediaItem[];
+      error?: { message: string };
+    } | RawInstagramMediaItem[];
 
-    if (payload.error) {
+    if ('error' in payload && payload.error) {
       console.warn('[Instagram Feed] API returned error:', payload.error.message);
       return [];
     }
 
-    const items: any[] = Array.isArray(payload) 
+    const items: RawInstagramMediaItem[] = Array.isArray(payload) 
       ? payload 
       : (payload.data && Array.isArray(payload.data) ? payload.data : []);
 
