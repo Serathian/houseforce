@@ -51,6 +51,11 @@ services:
       DATABASE_PASSWORD: password
       DATABASE_SSL: "false"
       NODE_ENV: development
+      SEED_TEST_DATA: "true"
+      SEED_ADMIN_EMAIL: staff@houseforce.com
+      SEED_ADMIN_PASSWORD: AdminPassword123!
+      SEED_CLIENT_EMAIL: client@example.com
+      SEED_CLIENT_PASSWORD: password123
     volumes:
       - ./backend:/opt/app
       - /opt/app/node_modules

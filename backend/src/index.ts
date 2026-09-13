@@ -84,27 +84,52 @@ export default {
         },
       });
 
-      // Seed test data if requested (e.g. CI/CD or local test runs)
+      // Seed test data if requested (e.g. CI/CD or local Docker stack)
       if (process.env.SEED_TEST_DATA === 'true') {
-        const staffEmail = 'staff@houseforce.com';
-        const clientEmail = 'client@example.com';
+        const staffEmail = process.env.SEED_ADMIN_EMAIL || 'staff@houseforce.com';
+        const staffPassword = process.env.SEED_ADMIN_PASSWORD || 'AdminPassword123!';
+        const clientEmail = process.env.SEED_CLIENT_EMAIL || 'client@example.com';
+        const clientPassword = process.env.SEED_CLIENT_PASSWORD || 'password123';
 
-        const existingAdmin = await strapi.db.query('admin::user').findOne({
+        // 1. Enable local email authentication provider if disabled
+        try {
+          const pluginStore = strapi.store({ type: 'plugin', name: 'users-permissions' });
+          const grant = (await pluginStore.get({ key: 'grant' })) as any;
+          if (grant && grant.email && !grant.email.enabled) {
+            grant.email.enabled = true;
+            await pluginStore.set({ key: 'grant', value: grant });
+            console.log('[Strapi Bootstrap] Enabled local email auth provider');
+          }
+        } catch (storeErr) {
+          console.warn('[Strapi Bootstrap] Failed to enable email provider:', storeErr);
+        }
+
+        // 2. Ensure Super Admin user exists
+        let adminUser = await strapi.db.query('admin::user').findOne({
           where: { email: staffEmail },
         });
 
-        if (!existingAdmin) {
-          await strapi.db.query('admin::user').create({
+        if (!adminUser) {
+          const superAdminRole = await strapi.db.query('admin::role').findOne({
+            where: { code: 'strapi-super-admin' },
+          });
+
+          const hashedPassword = await (strapi.service('admin::auth') as any).hashPassword(staffPassword);
+          adminUser = await strapi.db.query('admin::user').create({
             data: {
               email: staffEmail,
-              firstname: 'John',
+              firstname: 'Houseforce',
               lastname: 'Staff',
+              username: 'staff',
+              password: hashedPassword,
               isActive: true,
+              roles: superAdminRole ? [superAdminRole.id] : [],
             },
           });
-          console.log(`[Strapi Bootstrap] Seeded test admin staff: ${staffEmail}`);
+          console.log(`[Strapi Bootstrap] Seeded admin staff user: ${staffEmail}`);
         }
 
+        // 3. Ensure Client user exists with local provider password
         let testClient = await strapi.db.query('plugin::users-permissions.user').findOne({
           where: { email: clientEmail },
         });
@@ -113,25 +138,44 @@ export default {
           testClient = await strapi.plugin('users-permissions').service('user').add({
             email: clientEmail,
             username: clientEmail,
-            password: 'password123',
+            password: clientPassword,
             confirmed: true,
             provider: 'local',
             role: authRole?.id,
           });
-          console.log(`[Strapi Bootstrap] Seeded test client user: ${clientEmail}`);
+          console.log(`[Strapi Bootstrap] Seeded client user: ${clientEmail}`);
         }
 
-        const existingProjects = await strapi.entityService.findMany('api::project.project');
+        // 4. Ensure projects exist and are linked to the test client
+        const existingProjects = (await strapi.db.query('api::project.project').findMany({
+          populate: ['clients'],
+        })) as any[];
+
         if (!existingProjects || existingProjects.length === 0) {
           const newProject = await strapi.entityService.create('api::project.project', {
             data: {
               title: 'Modern Villa Renovation',
+              address: '123 Ocean Drive',
               projectStatus: 'in-progress',
               publishedAt: new Date(),
               clients: testClient ? ([testClient.id] as any) : undefined,
             },
           });
           console.log(`[Strapi Bootstrap] Seeded test project: #${newProject.id}`);
+        } else if (testClient) {
+          for (const project of existingProjects) {
+            const hasClient = project.clients?.some((c: any) => c.id === testClient.id);
+            if (!hasClient) {
+              const currentClientIds = project.clients?.map((c: any) => c.id) || [];
+              await strapi.db.query('api::project.project').update({
+                where: { id: project.id },
+                data: {
+                  clients: [...currentClientIds, testClient.id],
+                },
+              });
+              console.log(`[Strapi Bootstrap] Linked client ${testClient.id} to project #${project.id}`);
+            }
+          }
         }
       }
 

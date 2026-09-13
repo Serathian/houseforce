@@ -9,8 +9,8 @@ export default factories.createCoreController('api::update-message.update-messag
     if (user) {
       ctx.request.body = ctx.request.body || {};
       ctx.request.body.data = ctx.request.body.data || {};
-      ctx.request.body.data.clientAuthor = user.id;
       ctx.request.body.data.authorType = 'client';
+      delete ctx.request.body.data.clientAuthor;
     }
 
     const response = await super.create(ctx);
@@ -18,15 +18,23 @@ export default factories.createCoreController('api::update-message.update-messag
     try {
       const message = response.data;
 
-      // Force-link relation if stripped by REST permissions
-      if (intendedUpdateId && message?.documentId) {
-        await strapi.documents('api::update-message.update-message').update({
-          documentId: message.documentId,
-          data: {
-            update: intendedUpdateId,
-          },
-        });
-        strapi.log.info(`[UpdateMessage Controller] Linked message ${message.documentId} to update ${intendedUpdateId}`);
+      // Force-link relations if stripped or restricted by REST permissions
+      if (message?.documentId) {
+        const updateData: any = {};
+        if (intendedUpdateId) {
+          updateData.update = intendedUpdateId;
+        }
+        if (user) {
+          updateData.clientAuthor = user.id;
+        }
+
+        if (Object.keys(updateData).length > 0) {
+          await strapi.documents('api::update-message.update-message').update({
+            documentId: message.documentId,
+            data: updateData,
+          });
+          strapi.log.info(`[UpdateMessage Controller] Linked relations for message ${message.documentId}`);
+        }
       }
     } catch (err) {
       strapi.log.error('[UpdateMessage Controller] Error force-linking relation:', err);
