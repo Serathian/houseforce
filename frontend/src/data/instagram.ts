@@ -112,3 +112,6 @@ export const houseforceInstagramFeed: InstagramPost[] = [
     likedBy: 'paul_reddy',
   },
 ];
+
+export { getInstagramFeed, getInstagramProfile } from '@/lib/instagram';
+
