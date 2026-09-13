@@ -1,5 +1,6 @@
 import { Link } from 'next-view-transitions';
 import { ArrowRight, Calendar, Tag } from 'lucide-react';
+import { constItems, keyItems } from '@/data/services';
 
 interface StrapiCategory {
   name: string;
@@ -77,6 +78,16 @@ export default async function Blog({
     if (post.category?.name) addCat(post.category.name, post.category.slug);
   });
 
+  // If a category was requested via search params (e.g. from service page icons),
+  // ensure it appears in the filter tabs even if no CMS posts have been published for it yet
+  if (activeCategory !== 'all' && !dynamicCategoriesMap.has(activeCategory)) {
+    const knownItem = [...constItems, ...keyItems].find(item => item.categorySlug === activeCategory);
+    const label = knownItem 
+      ? knownItem.label 
+      : activeCategory.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    dynamicCategoriesMap.set(activeCategory, { label, slug: activeCategory });
+  }
+
   const categories = [
     { label: 'All Showcases', slug: 'all' },
     ...Array.from(dynamicCategoriesMap.values())
@@ -151,6 +162,19 @@ export default async function Blog({
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
             <h3 className="text-xl font-bold text-slate-900 mb-2">No Showcases Posted Yet</h3>
             <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Showcases in This Category Yet</h3>
+            <p className="text-slate-500 font-light text-sm mb-6">
+              We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
+            </p>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
+            >
+              View All Showcases <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         ) : (
           <div className="space-y-16">
