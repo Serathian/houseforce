@@ -69,6 +69,7 @@ async function getProject(documentId: string, token: string): Promise<Project | 
   const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
   let res: Response;
 
+  try {
     // Querying explicitly by documentId with deep population for both update media and messages
     res = await fetch(
       `${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate][0]=images&populate[updates][populate][1]=messages`,

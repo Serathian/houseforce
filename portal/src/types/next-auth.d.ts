@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession } from "next-auth";
+import type { DefaultSession, DefaultUser, Account as NextAuthAccount } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
@@ -9,6 +9,11 @@ declare module "next-auth" {
   }
 
   interface User extends DefaultUser {
+    strapiToken?: string;
+    strapiUserId?: number;
+  }
+
+  interface Account extends NextAuthAccount {
     strapiToken?: string;
     strapiUserId?: number;
   }

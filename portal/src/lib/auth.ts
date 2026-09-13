@@ -85,8 +85,10 @@ export const authOptions: NextAuthOptions = {
           if (data.jwt) {
             // Temporarily store the Strapi JWT and User ID on the account object
             // so it can be passed to the jwt() callback below.
-            (account as any).strapiToken = data.jwt;
-            (account as any).strapiUserId = data.user.id;
+            if (account) {
+              account.strapiToken = data.jwt;
+              account.strapiUserId = data.user.id;
+            }
             return true;
           }
           return false; // Strapi rejected the login (e.g. user was not pre-created by admin)
@@ -99,14 +101,14 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user, account }) {
       // If user exists (from credentials provider)
-      if (user && (user as any).strapiToken) {
-        token.strapiToken = (user as any).strapiToken;
-        token.strapiUserId = (user as any).strapiUserId;
+      if (user?.strapiToken) {
+        token.strapiToken = user.strapiToken;
+        token.strapiUserId = user.strapiUserId;
       }
       // If account exists (from OAuth provider)
-      if ((account as any)?.strapiToken) {
-        token.strapiToken = (account as any).strapiToken;
-        token.strapiUserId = (account as any).strapiUserId;
+      if (account?.strapiToken) {
+        token.strapiToken = account.strapiToken;
+        token.strapiUserId = account.strapiUserId;
       }
       return token;
     },
