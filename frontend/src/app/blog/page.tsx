@@ -2,6 +2,13 @@ import { Link } from 'next-view-transitions';
 import { ArrowRight, Calendar, Tag } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
 
+interface StrapiAuthor {
+  name: string;
+  role: string;
+  avatarUrl?: string;
+  avatar?: { url: string };
+}
+
 interface StrapiCategory {
   name: string;
   slug: string;
@@ -13,7 +20,7 @@ interface StrapiPost {
   slug: string;
   content: string;
   createdAt: string;
-  authorName?: string;
+  author?: StrapiAuthor;
   category?: StrapiCategory;
   categories?: StrapiCategory[];
   coverImage?: { url: string };
