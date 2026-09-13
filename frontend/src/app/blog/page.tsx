@@ -4,7 +4,8 @@ import { ArrowRight, Pin, Clock } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
 import CategoryAnchorCard from '@/components/blog/CategoryAnchorCard';
 import BlogCard from '@/components/blog/BlogCard';
-import InstagramBannerCard from '@/components/blog/InstagramBannerCard';
+import InstagramBlogCard from '@/components/blog/InstagramBlogCard';
+import { houseforceInstagramFeed } from '@/data/instagram';
 
 interface StrapiAuthor {
   name: string;
@@ -291,7 +292,9 @@ export default async function Blog({
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
               <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
             </div>
-            <InstagramBannerCard />
+            <div className="max-w-md mx-auto">
+              <InstagramBlogCard post={houseforceInstagramFeed[0]} />
+            </div>
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="space-y-12">
@@ -307,7 +310,9 @@ export default async function Blog({
                 View All Showcases <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <InstagramBannerCard />
+            <div className="max-w-md mx-auto">
+              <InstagramBlogCard post={houseforceInstagramFeed[0]} />
+            </div>
           </div>
         ) : activeView === 'pinned' ? (
           /* "All Pinned" View State */
@@ -331,13 +336,18 @@ export default async function Blog({
                     <span>Switch back to Most Recent</span>
                   </Link>
                 </div>
-                <InstagramBannerCard />
+                <div className="max-w-md mx-auto">
+                  <InstagramBlogCard post={houseforceInstagramFeed[0]} />
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {pinnedPosts.map((post: StrapiPost, index: number) => {
-                  const bannerTargetIndex = Math.min(INSTAGRAM_FEED_INTERVAL - 1, pinnedPosts.length - 1);
-                  const showBannerOnce = index === bannerTargetIndex;
+                  const shouldShowInstagramCard =
+                    (index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
+                    (pinnedPosts.length < INSTAGRAM_FEED_INTERVAL && index === pinnedPosts.length - 1);
+                  const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % houseforceInstagramFeed.length;
+                  const igPost = houseforceInstagramFeed[igIndex] || houseforceInstagramFeed[0];
 
                   return (
                     <Fragment key={post.id}>
@@ -347,8 +357,8 @@ export default async function Blog({
                         imageUrl={getImageUrl(post)}
                         strapiBase={strapiBase}
                       />
-                      {showBannerOnce && (
-                        <InstagramBannerCard />
+                      {shouldShowInstagramCard && (
+                        <InstagramBlogCard post={igPost} />
                       )}
                     </Fragment>
                   );
@@ -391,8 +401,11 @@ export default async function Blog({
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {regularPosts.map((post: StrapiPost, index: number) => {
-                    const bannerTargetIndex = Math.min(INSTAGRAM_FEED_INTERVAL - 1, regularPosts.length - 1);
-                    const showBannerOnce = index === bannerTargetIndex;
+                    const shouldShowInstagramCard =
+                      (index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
+                      (regularPosts.length < INSTAGRAM_FEED_INTERVAL && index === regularPosts.length - 1);
+                    const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % houseforceInstagramFeed.length;
+                    const igPost = houseforceInstagramFeed[igIndex] || houseforceInstagramFeed[0];
 
                     return (
                       <Fragment key={post.id}>
@@ -402,8 +415,8 @@ export default async function Blog({
                           imageUrl={getImageUrl(post)}
                           strapiBase={strapiBase}
                         />
-                        {showBannerOnce && (
-                          <InstagramBannerCard />
+                        {shouldShowInstagramCard && (
+                          <InstagramBlogCard post={igPost} />
                         )}
                       </Fragment>
                     );
@@ -411,8 +424,9 @@ export default async function Blog({
                 </div>
               </div>
             ) : pinnedPosts.length > 0 ? (
-              /* If only pinned posts exist in this view, render Instagram banner below */
-              <InstagramBannerCard />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <InstagramBlogCard post={houseforceInstagramFeed[0]} />
+              </div>
             ) : null}
           </div>
         )}
