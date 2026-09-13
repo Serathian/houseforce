@@ -37,6 +37,15 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::author.author",
+      "inversedBy": "posts"
+    },
+    "authorName": {
+      "type": "string"
     }
   }
 }

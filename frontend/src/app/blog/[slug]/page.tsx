@@ -1,6 +1,32 @@
 import { notFound } from 'next/navigation';
 
-async function getPost(slug: string) {
+interface StrapiAuthor {
+  name: string;
+  role: string;
+  bio?: string;
+  avatar?: { url: string };
+  avatarUrl?: string;
+}
+
+interface StrapiCategory {
+  name: string;
+  slug: string;
+}
+
+interface StrapiPost {
+  id: string | number;
+  title: string;
+  slug: string;
+  content: string;
+  createdAt: string;
+  authorName?: string;
+  author?: StrapiAuthor;
+  category?: StrapiCategory;
+  categories?: StrapiCategory[];
+  coverImage?: { url: string };
+}
+
+async function getPost(slug: string): Promise<StrapiPost | null> {
   try {
     const strapiFetchUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
     // Use filters[slug][$eq]=... instead of /api/posts/slug
@@ -39,27 +65,37 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     categories.push(post.category);
   }
 
-  const categoryNamesStr = categories.map(c => c.name?.toLowerCase() || '').join(' ');
+  // Determine author details: prioritize direct CMS Author relation, then authorName string, then fallback
+  const fallbackAuthorName = post.authorName || 'Paul Reddy';
+  const authorName = post.author?.name || fallbackAuthorName;
 
-  // Determine team author details dynamically
-  const authorName = post.authorName || (
-    categoryNamesStr.includes('keyholding') || categoryNamesStr.includes('cleaning') || post.title?.toLowerCase().includes('key') ? 'Paige Reddy' :
-    categoryNamesStr.includes('permit') || categoryNamesStr.includes('planning') || post.title?.toLowerCase().includes('license') ? 'Gabriel "Skippy"' :
-    categoryNamesStr.includes('tech') || categoryNamesStr.includes('web') || post.title?.toLowerCase().includes('web') ? 'Jake Reddy' : 'Paul Reddy'
+  const authorRole = post.author?.role || (
+    authorName.includes('Paige') ? 'Keyholding & Property Care Manager' :
+    authorName.includes('Skippy') || authorName.includes('Gabriel') ? 'Operations & Local Liaison' :
+    authorName.includes('Jake') ? 'Head of Digital Systems' : 'Founder & Master Contractor'
   );
 
-  const authorRole = (
-    authorName === 'Paige Reddy' ? 'Keyholding & Property Care Manager' :
-    authorName === 'Gabriel "Skippy"' ? 'Operations & Local Liaison' :
-    authorName === 'Jake Reddy' ? 'Head of Digital Systems' : 'Founder & Master Contractor'
-  );
+  const defaultAuthorImages: Record<string, string> = {
+    'Paige Reddy': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop',
+    'Gabriel "Skippy"': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
+    'Jake Reddy': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
+    'Paul Reddy': 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop',
+  };
 
-  const authorImage = (
-    authorName === 'Paige Reddy' ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop' :
-    authorName === 'Gabriel "Skippy"' ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop' :
-    authorName === 'Jake Reddy' ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop' :
-    'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop'
-  );
+  const getAuthorImage = () => {
+    if (post.author?.avatar?.url) {
+      return post.author.avatar.url.startsWith('http')
+        ? post.author.avatar.url
+        : `${strapiBase}${post.author.avatar.url}`;
+    }
+    if (post.author?.avatarUrl) {
+      return post.author.avatarUrl;
+    }
+    return defaultAuthorImages[authorName] || defaultAuthorImages['Paul Reddy'];
+  };
+
+  const authorImage = getAuthorImage();
+  const authorBio = post.author?.bio || 'Part of the HouseForce family team in Torrevieja. We document our real site work and property management to give homeowners 100% transparency.';
 
   return (
     <article className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 font-sans">
@@ -111,7 +147,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <h4 className="text-xl font-extrabold text-slate-900 mb-1">{authorName}</h4>
           <p className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">{authorRole}</p>
           <p className="text-slate-600 text-sm font-light leading-relaxed">
-            Part of the HouseForce family team in Torrevieja. We document our real site work and property management to give homeowners 100% transparency.
+            {authorBio}
           </p>
         </div>
       </div>

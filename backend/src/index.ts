@@ -23,6 +23,8 @@ export default {
           'api::post.post.findOne',
           'api::category.category.find',
           'api::category.category.findOne',
+          'api::author.author.find',
+          'api::author.author.findOne',
         ];
 
         for (const action of actions) {
