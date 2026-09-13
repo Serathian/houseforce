@@ -521,7 +521,6 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
   };
   attributes: {
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
-    authorName: Schema.Attribute.String;
     categories: Schema.Attribute.Relation<
       'manyToMany',
       'api::category.category'

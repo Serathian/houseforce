@@ -20,7 +20,6 @@ interface StrapiPost {
   slug: string;
   content: string;
   createdAt: string;
-  authorName?: string;
   author?: StrapiAuthor;
   category?: StrapiCategory;
   categories?: StrapiCategory[];
