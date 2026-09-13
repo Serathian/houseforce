@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "update_messages",
+  "info": {
+    "singularName": "update-message",
+    "pluralName": "update-messages",
+    "displayName": "Update Message",
+    "description": "A single message in a project update thread"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "authorType": {
+      "type": "enumeration",
+      "enum": ["staff", "client"],
+      "default": "client"
+    },
+    "clientAuthor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "staffName": {
+      "type": "string"
+    },
+    "update": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::update.update",
+      "inversedBy": "messages"
+    }
+  }
+}

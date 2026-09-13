@@ -1,0 +1,31 @@
+meta {
+  name: Portal: Get Project With Updates & Messages
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/projects?filters[id][$eq]={{projectId}}&populate[updates][populate][0]=messages
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwtToken}}
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("project returned", function() {
+    expect(res.getBody().data).to.be.an('array');
+    expect(res.getBody().data.length).to.be.greaterThan(0);
+  });
+
+  test("updates populated", function() {
+    const project = res.getBody().data[0];
+    expect(project.updates).to.be.an('array');
+  });
+}

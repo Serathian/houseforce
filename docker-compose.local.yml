@@ -61,6 +61,11 @@ services:
       DO_SPACE_ENDPOINT: http://minio:9000
       DO_SPACE_BUCKET: uploads
       DO_SPACE_REGION: us-east-1
+      SEED_TEST_DATA: ${SEED_TEST_DATA:-true}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-staff@houseforce.com}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-AdminPassword123!}
+      SEED_CLIENT_EMAIL: ${SEED_CLIENT_EMAIL:-client@example.com}
+      SEED_CLIENT_PASSWORD: ${SEED_CLIENT_PASSWORD:-password123}
     volumes:
       - ./backend:/opt/app
       - /opt/app/node_modules
@@ -95,6 +100,7 @@ services:
       NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-local-development-secret-key-12345}
+      NEXT_PUBLIC_ENABLE_DEV_LOGIN: "true"
     volumes:
       - ./portal:/app
       - /app/node_modules

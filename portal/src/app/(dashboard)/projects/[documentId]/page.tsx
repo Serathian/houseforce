@@ -5,6 +5,16 @@ import { format, parseISO } from "date-fns";
 import { Link } from 'next-view-transitions';
 import { ArrowLeft, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { UpdateThread } from "@/components/UpdateThread";
+
+interface UpdateMessage {
+  id: number;
+  documentId: string;
+  content: string;
+  authorType: 'staff' | 'client';
+  staffName?: string;
+  createdAt: string;
+}
 
 interface MediaImage {
   id: number;
@@ -29,6 +39,7 @@ interface ProjectUpdate {
   date: string;
   images?: MediaImage[];
   createdAt: string;
+  messages?: UpdateMessage[];
 }
 
 interface Project {
@@ -55,27 +66,36 @@ function resolveMediaUrl(url?: string): string {
 }
 
 async function getProject(documentId: string, token: string): Promise<Project | null> {
-  try {
-    const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
-    // Querying explicitly by documentId with deep population for update media
-    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate]=images`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      next: { revalidate: 0 }
-    });
-    
-    if (!res.ok) {
-      console.error("Failed to fetch project:", await res.text());
-      return null;
-    }
-    
-    const json = await res.json();
-    return json.data?.[0] || null;
+  const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
+  let res: Response;
+
+    // Querying explicitly by documentId with deep population for both update media and messages
+    res = await fetch(
+      `${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate][0]=images&populate[updates][populate][1]=messages`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        next: { revalidate: 0 },
+      }
+    );
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error("[Portal] Network error fetching project:", error);
     return null;
   }
+
+  if (res.status === 401) {
+    redirect("/login?error=SessionExpired");
+  }
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "Unknown error");
+    console.warn(`[Portal] Failed to fetch project (${res.status}):`, errorText);
+    return null;
+  }
+
+  const json = await res.json().catch(() => ({}));
+  return json.data?.[0] || null;
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ documentId: string }> }) {
@@ -163,7 +183,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </div>
       ) : (
         <div className="relative border-l-2 border-slate-200 ml-4 sm:ml-6 space-y-10 pb-10">
-          {sortedUpdates.map((update, index) => (
+          {sortedUpdates.map((update) => (
             <div key={update.id} className="relative pl-8 sm:pl-12">
               {/* Timeline Node */}
               <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-4 border-teal-500 shadow-sm"></div>
@@ -223,6 +243,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     </div>
                   </div>
                 )}
+
+                <UpdateThread 
+                  updateId={update.id} 
+                  initialMessages={update.messages} 
+                  token={session.strapiToken || ""} 
+                />
               </div>
             </div>
           ))}

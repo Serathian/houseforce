@@ -1,0 +1,39 @@
+meta {
+  name: Portal: Client Posts Thread Message
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/update-messages
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwtToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "data": {
+      "content": "This is a reply submitted from the customer portal UI.",
+      "authorType": "client",
+      "update": {{updateId}}
+    }
+  }
+}
+
+tests {
+  test("status is 200 or 201", function() {
+    expect([200, 201]).to.include(res.getStatus());
+  });
+
+  test("message was created", function() {
+    expect(res.getBody().data.id).to.be.a('number');
+  });
+}

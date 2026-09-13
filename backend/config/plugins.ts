@@ -35,7 +35,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
-      provider: 'aws-s3',
+      provider: '@strapi/provider-upload-aws-s3',
       providerOptions: {
         s3Options: {
           credentials: {
@@ -58,6 +58,24 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,
+      },
+    },
+  },
+  email: {
+    config: {
+      provider: '@strapi/provider-email-nodemailer',
+      providerOptions: {
+        host: 'smtp.postmarkapp.com',
+        port: 587,
+        auth: {
+          user: env('POSTMARK_API_TOKEN'),
+          pass: env('POSTMARK_API_TOKEN'),
+        },
+        // ... any custom nodemailer options
+      },
+      settings: {
+        defaultFrom: env('EMAIL_DEFAULT_FROM', 'updates@replies.houseforce.com'),
+        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO', 'updates@replies.houseforce.com'),
       },
     },
   },
