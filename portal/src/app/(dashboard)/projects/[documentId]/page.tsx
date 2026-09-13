@@ -6,12 +6,28 @@ import { Link } from 'next-view-transitions';
 import { ArrowLeft, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
+interface MediaImage {
+  id: number;
+  documentId?: string;
+  name?: string;
+  url: string;
+  alternativeText?: string | null;
+  caption?: string | null;
+  formats?: {
+    thumbnail?: { url: string };
+    small?: { url: string };
+    medium?: { url: string };
+    large?: { url: string };
+  };
+}
+
 interface ProjectUpdate {
   id: number;
   documentId: string;
   title: string;
   content: string;
   date: string;
+  images?: MediaImage[];
   createdAt: string;
 }
 
@@ -26,11 +42,23 @@ interface Project {
   updatedAt: string;
 }
 
+function resolveMediaUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://minio:9000')) {
+    return url.replace('http://minio:9000', 'http://localhost:9000');
+  }
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+  return `${strapiUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 async function getProject(documentId: string, token: string): Promise<Project | null> {
   try {
     const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
-    // Querying explicitly by documentId to be safe
-    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate=updates`, {
+    // Querying explicitly by documentId with deep population for update media
+    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate]=images`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -153,7 +181,46 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 
                 {update.content && (
                   <div className="prose prose-slate prose-sm sm:prose-base prose-a:text-teal-600 prose-headings:text-slate-800 max-w-none">
-                    <ReactMarkdown>{update.content}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        img: ({ src, alt }) => (
+                          <img
+                            src={resolveMediaUrl(typeof src === 'string' ? src : '')}
+                            alt={alt || "Project update image"}
+                            className="rounded-2xl border border-slate-200 shadow-sm max-h-[500px] w-auto object-cover my-4"
+                          />
+                        ),
+                      }}
+                    >
+                      {update.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+
+                {/* Dedicated Attached Photos Gallery */}
+                {update.images && update.images.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-slate-100">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                      <ImageIcon className="w-4 h-4 text-teal-600" />
+                      Attached Photos ({update.images.length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {update.images.map((img) => (
+                        <a
+                          key={img.id}
+                          href={resolveMediaUrl(img.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group/img block relative aspect-video rounded-xl overflow-hidden bg-slate-100 border border-slate-200 hover:shadow-md transition-all"
+                        >
+                          <img
+                            src={resolveMediaUrl(img.formats?.medium?.url || img.url)}
+                            alt={img.alternativeText || img.name || "Update attachment"}
+                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-200"
+                          />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

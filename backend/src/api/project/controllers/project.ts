@@ -16,6 +16,20 @@ export default factories.createCoreController('api::project.project', ({ strapi 
       where: { clients: user.id },
       select: ['id']
     });
+
+    if (!allowedProjects || allowedProjects.length === 0) {
+      return {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 0,
+            total: 0,
+          },
+        },
+      };
+    }
     
     // Inject the allowed IDs into the REST query, completely avoiding relational filter errors
     ctx.query.filters = {

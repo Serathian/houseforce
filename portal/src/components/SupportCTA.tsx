@@ -8,8 +8,7 @@ export default function SupportCTA() {
   const { isOpen, open, close } = useSupportPopup();
   const { data: session, status } = useSession();
 
-  // Hide for authenticated users — they have the nav menu pill instead
-  if (status === "loading" || session) return null;
+  if (status === "loading") return null;
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end pointer-events-none">
@@ -53,19 +52,21 @@ export default function SupportCTA() {
         </div>
       )}
 
-      {/* Floating Launcher Button */}
-      <button
-        onClick={() => (isOpen ? close() : open())}
-        className="pointer-events-auto flex items-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-4 py-3 rounded-full shadow-xl border border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 group active:scale-95"
-        aria-label="Toggle support menu"
-      >
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
-        </span>
-        <LifeBuoy className="w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" />
-        <span className="text-xs font-bold tracking-wide">Need Help?</span>
-      </button>
+      {/* Floating Launcher Button - only visible when not authenticated to avoid overlapping mobile nav pill */}
+      {!session && (
+        <button
+          onClick={() => (isOpen ? close() : open())}
+          className="pointer-events-auto flex items-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-4 py-3 rounded-full shadow-xl border border-slate-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 group active:scale-95"
+          aria-label="Toggle support menu"
+        >
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
+          </span>
+          <LifeBuoy className="w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" />
+          <span className="text-xs font-bold tracking-wide">Need Help?</span>
+        </button>
+      )}
     </div>
   );
 }

@@ -72,12 +72,12 @@ export default {
         }
       }
 
-      // Add Lifecycle hook to force provider to 'google' for new users created in Admin Panel
+      // Add Lifecycle hook to default provider to 'google' for new users created in Admin Panel
       strapi.db.lifecycles.subscribe({
         models: ['plugin::users-permissions.user'],
         async beforeCreate(event) {
           if (event.params.data) {
-            event.params.data.provider = 'google';
+            event.params.data.provider = event.params.data.provider || 'google';
           }
         },
       });
