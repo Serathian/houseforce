@@ -271,6 +271,61 @@ export default {
             }
           }
         }
+
+        // 5. Ensure all messages are linked to both draft and published update versions
+        try {
+          await strapi.db.connection.raw(`
+            INSERT INTO update_messages_update_lnk (update_message_id, update_id, update_message_ord)
+            SELECT DISTINCT 
+              lnk.update_message_id,
+              all_u.id as update_id,
+              lnk.update_message_ord
+            FROM update_messages_update_lnk lnk
+            JOIN updates curr_u ON curr_u.id = lnk.update_id
+            JOIN updates all_u ON all_u.document_id = curr_u.document_id
+            WHERE NOT EXISTS (
+              SELECT 1 FROM update_messages_update_lnk existing
+              WHERE existing.update_message_id = lnk.update_message_id
+                AND existing.update_id = all_u.id
+            );
+          `);
+        } catch (syncErr) {
+          console.warn('[Strapi Bootstrap] Failed to sync message-update links:', syncErr);
+        }
+
+        // 6. Configure Strapi CMS Content Manager layouts for Update Messages & Updates
+        try {
+          const msgConfigKey = 'plugin_content_manager_configuration_content_types::api::update-message.update-message';
+          const msgConfigEntry = await strapi.db.query('strapi::core-store').findOne({ where: { key: msgConfigKey } });
+          if (msgConfigEntry && msgConfigEntry.value) {
+            const config = JSON.parse(msgConfigEntry.value);
+            config.settings.mainField = 'content';
+            config.settings.defaultSortBy = 'id';
+            config.settings.defaultSortOrder = 'DESC';
+            if (!config.layouts.list.includes('update')) {
+              config.layouts.list = ['id', 'content', 'authorType', 'update', 'staffName'];
+            }
+            await strapi.db.query('strapi::core-store').update({
+              where: { key: msgConfigKey },
+              data: { value: JSON.stringify(config) },
+            });
+          }
+
+          const updConfigKey = 'plugin_content_manager_configuration_content_types::api::update.update';
+          const updConfigEntry = await strapi.db.query('strapi::core-store').findOne({ where: { key: updConfigKey } });
+          if (updConfigEntry && updConfigEntry.value) {
+            const config = JSON.parse(updConfigEntry.value);
+            if (config.metadatas?.messages?.edit) {
+              config.metadatas.messages.edit.mainField = 'content';
+            }
+            await strapi.db.query('strapi::core-store').update({
+              where: { key: updConfigKey },
+              data: { value: JSON.stringify(config) },
+            });
+          }
+        } catch (confErr) {
+          console.warn('[Strapi Bootstrap] Failed to update CMS content manager layouts:', confErr);
+        }
       }
 
     } catch (err) {
