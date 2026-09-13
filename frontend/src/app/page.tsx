@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, ArrowRight, ArrowUp, ArrowDown, 
   CheckCircle2, ShieldCheck, Users, Hammer, Key, 
-  Sparkles, Star, Clock, ChevronRight, Send, Award
+  Sparkles, Star, Clock, Award
 } from 'lucide-react';
 import SpinningWheel from '@/components/SpinningWheel';
 
@@ -177,7 +177,7 @@ export default function Home() {
           isMobile={isMobile}
         />
         
-        <div className="absolute inset-0 w-full h-full flex flex-col md:flex-row pointer-events-none z-10">
+        <div className="absolute inset-0 w-full h-full flex flex-col md:flex-row pointer-events-none z-20">
           {/* Left/Top Content Container (Construction) */}
           <div className="h-1/2 md:h-full w-full md:w-1/2 flex flex-col items-center justify-start pt-6 sm:pt-10 md:justify-center md:pt-0 p-6 md:p-12 text-center">
             <AnimatePresence>
@@ -196,24 +196,14 @@ export default function Home() {
                     30+ years of expertise. <span className="text-amber-300 font-extrabold drop-shadow">Quality First</span> property renovations in Torrevieja.
                   </p>
 
-                  <AnimatePresence>
-                    {expandedSide === 'left' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20, transition: { duration: 0.2 } }}
-                        transition={{ delay: 1.5, duration: 0.5 }}
-                        className="pointer-events-auto"
-                      >
-                        <Link 
-                          href="/services/construction"
-                          className="inline-flex items-center bg-white text-blue-900 font-bold py-3 px-6 md:py-4 md:px-8 rounded-full shadow-xl hover:bg-blue-50 hover:scale-105 transition-all text-sm md:text-base"
-                        >
-                          Explore Construction <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
-                        </Link>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className="pointer-events-auto">
+                    <Link 
+                      href="/services/construction"
+                      className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm font-medium py-2 px-4 rounded-full text-xs shadow-sm md:bg-white md:text-blue-900 md:border-transparent md:font-bold md:py-4 md:px-8 md:text-base md:shadow-xl md:hover:bg-blue-50 md:hover:scale-105 transition-all"
+                    >
+                      Explore Construction <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                    </Link>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -237,24 +227,14 @@ export default function Home() {
                     <span className="text-amber-300 font-extrabold drop-shadow">Total peace of mind</span> for your Spanish property with meticulous cleaning and security.
                   </p>
 
-                  <AnimatePresence>
-                    {expandedSide === 'right' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20, transition: { duration: 0.2 } }}
-                        transition={{ delay: 1.5, duration: 0.5 }}
-                        className="pointer-events-auto"
-                      >
-                        <Link 
-                          href="/services/keyholding"
-                          className="inline-flex items-center bg-white text-teal-900 font-bold py-3 px-6 md:py-4 md:px-8 rounded-full shadow-xl hover:bg-teal-50 hover:scale-105 transition-all text-sm md:text-base"
-                        >
-                          Explore Keyholding <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
-                        </Link>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div className="pointer-events-auto">
+                    <Link 
+                      href="/services/keyholding"
+                      className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm font-medium py-2 px-4 rounded-full text-xs shadow-sm md:bg-white md:text-teal-900 md:border-transparent md:font-bold md:py-4 md:px-8 md:text-base md:shadow-xl md:hover:bg-teal-50 md:hover:scale-105 transition-all"
+                    >
+                      Explore Keyholding <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                    </Link>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
