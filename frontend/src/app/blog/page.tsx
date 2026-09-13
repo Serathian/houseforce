@@ -1,8 +1,13 @@
+import { Fragment } from 'react';
 import { Link } from 'next-view-transitions';
 import { ArrowRight, Pin, Clock } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
 import CategoryAnchorCard from '@/components/blog/CategoryAnchorCard';
 import BlogCard from '@/components/blog/BlogCard';
+import InstagramBlogCard from '@/components/blog/InstagramBlogCard';
+import YouTubeBlogCard from '@/components/blog/YouTubeBlogCard';
+import { getInstagramFeed } from '@/lib/instagram';
+import { getYouTubeFeed } from '@/lib/youtube';
 
 interface StrapiAuthor {
   name: string;
@@ -69,9 +74,11 @@ export default async function Blog({
   const activeView = resolvedParams.view?.toLowerCase() === 'pinned' ? 'pinned' : 'recent';
   const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
 
-  const [postsRes, categoriesRes] = await Promise.all([
+  const [postsRes, categoriesRes, instagramFeed, youtubeFeed] = await Promise.all([
     getPosts(),
-    getCategories()
+    getCategories(),
+    getInstagramFeed(),
+    getYouTubeFeed(),
   ]);
 
   const rawPosts: StrapiPost[] = postsRes.data || [];
@@ -201,6 +208,35 @@ export default async function Blog({
       : `/blog?category=${activeCategory}`;
   };
 
+  type SocialCard = 
+    | { type: 'youtube'; data: (typeof youtubeFeed)[0] }
+    | { type: 'instagram'; data: (typeof instagramFeed)[0] };
+
+  const socialFeed: SocialCard[] = [];
+  const maxSocialItems = Math.max(instagramFeed.length, youtubeFeed.length);
+  for (let i = 0; i < maxSocialItems; i++) {
+    // Alternate YouTube and Instagram when both are available
+    if (youtubeFeed[i]) {
+      socialFeed.push({ type: 'youtube', data: youtubeFeed[i] });
+    }
+    if (instagramFeed[i]) {
+      socialFeed.push({ type: 'instagram', data: instagramFeed[i] });
+    }
+  }
+
+  const SOCIAL_FEED_INTERVAL =
+    Number(process.env.NEXT_PUBLIC_SOCIAL_FEED_INTERVAL) ||
+    Number(process.env.NEXT_PUBLIC_INSTAGRAM_FEED_INTERVAL) ||
+    6;
+
+  const renderSocialCard = (item: SocialCard) => {
+    return item.type === 'youtube' ? (
+      <YouTubeBlogCard video={item.data} />
+    ) : (
+      <InstagramBlogCard post={item.data} />
+    );
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-20 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -282,22 +318,36 @@ export default async function Blog({
 
         {/* Main Content Area */}
         {posts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
-            <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
+          <div className="space-y-12">
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
+              <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
+            </div>
+            {socialFeed.length > 0 && (
+              <div className="max-w-md mx-auto">
+                {renderSocialCard(socialFeed[0])}
+              </div>
+            )}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs in This Category Yet</h3>
-            <p className="text-slate-500 font-light text-sm mb-6">
-              We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
-            >
-              View All Showcases <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="space-y-12">
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs in This Category Yet</h3>
+              <p className="text-slate-500 font-light text-sm mb-6">
+                We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
+              </p>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                View All Showcases <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            {socialFeed.length > 0 && (
+              <div className="max-w-md mx-auto">
+                {renderSocialCard(socialFeed[0])}
+              </div>
+            )}
           </div>
         ) : activeView === 'pinned' ? (
           /* "All Pinned" View State */
@@ -310,27 +360,45 @@ export default async function Blog({
             </div>
 
             {pinnedPosts.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md mx-auto shadow-sm">
-                <p className="text-slate-500 font-light text-sm mb-4">No pinned project logs currently found in this category.</p>
-                <Link
-                  href={getViewHref('recent')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 hover:underline"
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Switch back to Most Recent</span>
-                </Link>
+              <div className="space-y-12">
+                <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md mx-auto shadow-sm">
+                  <p className="text-slate-500 font-light text-sm mb-4">No pinned project logs currently found in this category.</p>
+                  <Link
+                    href={getViewHref('recent')}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 hover:underline"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Switch back to Most Recent</span>
+                  </Link>
+                </div>
+                {socialFeed.length > 0 && (
+                  <div className="max-w-md mx-auto">
+                    {renderSocialCard(socialFeed[0])}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {pinnedPosts.map((post: StrapiPost) => (
-                  <BlogCard 
-                    key={post.id}
-                    post={post}
-                    categories={getPostCategories(post)}
-                    imageUrl={getImageUrl(post)}
-                    strapiBase={strapiBase}
-                  />
-                ))}
+                {pinnedPosts.map((post: StrapiPost, index: number) => {
+                  const shouldShowSocialCard =
+                    socialFeed.length > 0 &&
+                    ((index + 1) % SOCIAL_FEED_INTERVAL === 0 ||
+                      (pinnedPosts.length < SOCIAL_FEED_INTERVAL && index === pinnedPosts.length - 1));
+                  const socialIndex = Math.floor(index / SOCIAL_FEED_INTERVAL) % Math.max(1, socialFeed.length);
+                  const socialItem = socialFeed[socialIndex];
+
+                  return (
+                    <Fragment key={post.id}>
+                      <BlogCard 
+                        post={post}
+                        categories={getPostCategories(post)}
+                        imageUrl={getImageUrl(post)}
+                        strapiBase={strapiBase}
+                      />
+                      {shouldShowSocialCard && socialItem && renderSocialCard(socialItem)}
+                    </Fragment>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -362,24 +430,39 @@ export default async function Blog({
             )}
 
             {/* Standard Posts in Chronological Order */}
-            {regularPosts.length > 0 && (
+            {regularPosts.length > 0 ? (
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight">
                   {activeCategory !== 'all' ? `More ${activeCategoryLabel} Project Logs` : 'Recent Project Logs & Updates'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {regularPosts.map((post: StrapiPost) => (
-                    <BlogCard 
-                      key={post.id}
-                      post={post}
-                      categories={getPostCategories(post)}
-                      imageUrl={getImageUrl(post)}
-                      strapiBase={strapiBase}
-                    />
-                  ))}
+                  {regularPosts.map((post: StrapiPost, index: number) => {
+                    const shouldShowSocialCard =
+                      socialFeed.length > 0 &&
+                      ((index + 1) % SOCIAL_FEED_INTERVAL === 0 ||
+                        (regularPosts.length < SOCIAL_FEED_INTERVAL && index === regularPosts.length - 1));
+                    const socialIndex = Math.floor(index / SOCIAL_FEED_INTERVAL) % Math.max(1, socialFeed.length);
+                    const socialItem = socialFeed[socialIndex];
+
+                    return (
+                      <Fragment key={post.id}>
+                        <BlogCard 
+                          post={post}
+                          categories={getPostCategories(post)}
+                          imageUrl={getImageUrl(post)}
+                          strapiBase={strapiBase}
+                        />
+                        {shouldShowSocialCard && socialItem && renderSocialCard(socialItem)}
+                      </Fragment>
+                    );
+                  })}
                 </div>
               </div>
-            )}
+            ) : pinnedPosts.length > 0 && socialFeed.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {renderSocialCard(socialFeed[0])}
+              </div>
+            ) : null}
           </div>
         )}
       </div>
