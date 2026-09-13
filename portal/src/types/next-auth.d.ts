@@ -7,6 +7,11 @@ declare module "next-auth" {
       id: number;
     } & DefaultSession["user"];
   }
+
+  interface User extends DefaultUser {
+    strapiToken?: string;
+    strapiUserId?: number;
+  }
 }
 
 declare module "next-auth/jwt" {

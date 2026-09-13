@@ -1,5 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+
+const isDevAuthEnabled =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "true";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -7,9 +12,61 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
+    ...(isDevAuthEnabled
+      ? [
+          CredentialsProvider({
+            id: "credentials",
+            name: "Dev Credentials",
+            credentials: {
+              identifier: { label: "Email", type: "email" },
+              password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
+              if (!credentials?.identifier || !credentials?.password) {
+                return null;
+              }
+              try {
+                const strapiUrl =
+                  process.env.STRAPI_INTERNAL_URL ||
+                  process.env.NEXT_PUBLIC_STRAPI_URL ||
+                  "http://localhost:1337";
+
+                const res = await fetch(`${strapiUrl}/api/auth/local`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    identifier: credentials.identifier,
+                    password: credentials.password,
+                  }),
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.jwt) {
+                  console.error("[Auth] Dev login failed:", data?.error || res.statusText);
+                  return null;
+                }
+
+                return {
+                  id: String(data.user.id),
+                  email: data.user.email,
+                  name: data.user.username || data.user.email,
+                  strapiToken: data.jwt as string,
+                  strapiUserId: data.user.id as number,
+                };
+              } catch (err) {
+                console.error("[Auth] Local Auth Error:", err);
+                return null;
+              }
+            },
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account }) {
+      if (account?.provider === "credentials") {
+        return !!user;
+      }
       if (account?.provider === "google") {
         console.log("ATTEMPTING LOGIN WITH GOOGLE EMAIL:", user.email);
         try {
@@ -28,8 +85,8 @@ export const authOptions: NextAuthOptions = {
           if (data.jwt) {
             // Temporarily store the Strapi JWT and User ID on the account object
             // so it can be passed to the jwt() callback below.
-            account.strapiToken = data.jwt;
-            account.strapiUserId = data.user.id;
+            (account as any).strapiToken = data.jwt;
+            (account as any).strapiUserId = data.user.id;
             return true;
           }
           return false; // Strapi rejected the login (e.g. user was not pre-created by admin)
@@ -40,11 +97,16 @@ export const authOptions: NextAuthOptions = {
       }
       return false;
     },
-    async jwt({ token, account }) {
-      // If account exists, this is the initial sign-in.
-      if (account?.strapiToken) {
-        token.strapiToken = account.strapiToken;
-        token.strapiUserId = account.strapiUserId;
+    async jwt({ token, user, account }) {
+      // If user exists (from credentials provider)
+      if (user && (user as any).strapiToken) {
+        token.strapiToken = (user as any).strapiToken;
+        token.strapiUserId = (user as any).strapiUserId;
+      }
+      // If account exists (from OAuth provider)
+      if ((account as any)?.strapiToken) {
+        token.strapiToken = (account as any).strapiToken;
+        token.strapiUserId = (account as any).strapiUserId;
       }
       return token;
     },

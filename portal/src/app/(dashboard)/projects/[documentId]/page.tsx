@@ -178,7 +178,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <UpdateThread 
                   updateId={update.id} 
                   initialMessages={update.messages} 
-                  token={session.strapiToken} 
+                  token={session.strapiToken || ""} 
                 />
               </div>
             </div>

@@ -3,28 +3,72 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import SpinningWheel from "@/components/SpinningWheel";
+import { Mail, Key, Sparkles, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+
+const isDevMode =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "true";
 
 function LoginCenterNode() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
+  const [email, setEmail] = useState("client@example.com");
+  const [password, setPassword] = useState("password123");
+  const [showDevForm, setShowDevForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const handleCredentialsLogin = async (loginEmail = email, loginPassword = password) => {
+    setIsLoading(true);
+    setAuthError(null);
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        identifier: loginEmail,
+        password: loginPassword,
+        callbackUrl: "/",
+      });
+
+      if (res?.error) {
+        setAuthError("Invalid email or password");
+        setIsLoading(false);
+      } else if (res?.url) {
+        window.location.href = res.url;
+      } else {
+        window.location.href = "/";
+      }
+    } catch {
+      setAuthError("Connection error. Check backend.");
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3 max-w-sm mx-auto">
       {error === "AccessDenied" && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-xs sm:text-sm font-semibold border border-red-100 text-center max-w-xs shadow-lg">
+        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs sm:text-sm font-semibold border border-red-100 text-center max-w-xs shadow-lg">
           Access denied. Your email is not registered.
         </div>
       )}
       {error === "SessionExpired" && (
-        <div className="bg-amber-50 text-amber-800 p-3 rounded-lg text-xs sm:text-sm font-semibold border border-amber-200 text-center max-w-xs shadow-lg">
+        <div className="bg-amber-50 text-amber-800 p-3 rounded-xl text-xs sm:text-sm font-semibold border border-amber-200 text-center max-w-xs shadow-lg">
           Your session has expired. Please sign in again.
         </div>
       )}
+      {authError && (
+        <div className="flex items-center gap-2 bg-red-50 text-red-600 p-2.5 rounded-xl text-xs font-semibold border border-red-100 max-w-xs shadow-md">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{authError}</span>
+        </div>
+      )}
+
+      {/* Primary Google SSO Button */}
       <button
         onClick={() => signIn("google", { callbackUrl: "/" })}
-        className="flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-6 py-4 sm:px-8 sm:py-4 rounded-full text-md font-bold transition-transform hover:scale-105 active:scale-95 shadow-2xl"
+        className="flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full text-sm sm:text-md font-bold transition-transform hover:scale-105 active:scale-95 shadow-2xl cursor-pointer"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -34,6 +78,101 @@ function LoginCenterNode() {
         </svg>
         Sign in with Google
       </button>
+
+      {/* Dev Mode Email Sign-In (Excluded in Production) */}
+      {isDevMode && (
+        <div className="w-full flex flex-col items-center mt-1">
+          <button
+            type="button"
+            onClick={() => setShowDevForm(!showDevForm)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors bg-white/90 hover:bg-white px-3.5 py-1.5 rounded-full border border-slate-200/90 shadow-md backdrop-blur-sm cursor-pointer"
+          >
+            <span>🛠️ Local Dev Sign-In</span>
+            {showDevForm ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          <AnimatePresence>
+            {showDevForm && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="w-72 sm:w-80 mt-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200 flex flex-col gap-3 text-left"
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-bold text-slate-700">Email & Password</span>
+                  <span className="text-[10px] font-semibold bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-200/60">
+                    Local Dev
+                  </span>
+                </div>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCredentialsLogin();
+                  }}
+                  className="flex flex-col gap-2.5"
+                >
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800"
+                        placeholder="client@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Key className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full mt-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    {isLoading ? "Signing in..." : "Sign In with Credentials"}
+                  </button>
+                </form>
+
+                <div className="pt-2 border-t border-slate-100 flex flex-col items-center">
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => handleCredentialsLogin("client@example.com", "password123")}
+                    className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold py-1.5 px-2 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <span>1-Click Login (client@example.com)</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }
@@ -56,8 +195,17 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50">
       
+      {/* Dev Environment Banner Badge */}
+      {isDevMode && (
+        <div className="absolute top-4 sm:top-6 z-50 flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 text-amber-900 px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm">
+          <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span>Local Dev Mode</span>
+          <span className="text-amber-800/70 text-[11px] font-normal hidden sm:inline">| Email sign-in enabled</span>
+        </div>
+      )}
+
       {/* Top Header - Centered with True Logo Colors */}
-      <div className="absolute top-16 sm:top-24 left-0 w-full z-50 pointer-events-none flex flex-col items-center">
+      <div className="absolute top-16 sm:top-24 left-0 w-full z-40 pointer-events-none flex flex-col items-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 tracking-tight drop-shadow-sm">
           House<span className="text-teal-600">Force</span><span className="text-amber-500">.</span> 
         </h1>
