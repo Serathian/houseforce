@@ -15,19 +15,31 @@ interface Project {
 }
 
 async function getProjectsList(token: string): Promise<Project[]> {
+  const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
+  let res: Response;
+
   try {
-    const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
-    const res = await fetch(`${strapiUrl}/api/projects`, {
+    res = await fetch(`${strapiUrl}/api/projects`, {
       headers: { Authorization: `Bearer ${token}` },
-      next: { revalidate: 0 }
+      next: { revalidate: 0 },
     });
-    
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json.data || [];
   } catch (error) {
+    console.error("[Portal] Network error fetching projects list:", error);
     return [];
   }
+
+  if (res.status === 401) {
+    redirect("/login?error=SessionExpired");
+  }
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "Unknown error");
+    console.warn(`[Portal] Failed to fetch projects list (${res.status}):`, errorText);
+    return [];
+  }
+
+  const json = await res.json().catch(() => ({}));
+  return json.data || [];
 }
 
 export default async function ProjectsPage() {

@@ -38,27 +38,34 @@ interface Project {
 }
 
 async function getProject(documentId: string, token: string): Promise<Project | null> {
+  const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
+  let res: Response;
+
   try {
-    const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
     // Querying explicitly by documentId to be safe, now populating updates and their messages
-    const res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate][0]=messages`, {
+    res = await fetch(`${strapiUrl}/api/projects?filters[documentId][$eq]=${documentId}&populate[updates][populate][0]=messages`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       next: { revalidate: 0 }
     });
-    
-    if (!res.ok) {
-      console.error("Failed to fetch project:", await res.text());
-      return null;
-    }
-    
-    const json = await res.json();
-    return json.data?.[0] || null;
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error("[Portal] Network error fetching project:", error);
     return null;
   }
+
+  if (res.status === 401) {
+    redirect("/login?error=SessionExpired");
+  }
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "Unknown error");
+    console.warn(`[Portal] Failed to fetch project (${res.status}):`, errorText);
+    return null;
+  }
+
+  const json = await res.json().catch(() => ({}));
+  return json.data?.[0] || null;
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ documentId: string }> }) {

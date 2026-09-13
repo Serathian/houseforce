@@ -17,6 +17,11 @@ function LoginCenterNode() {
           Access denied. Your email is not registered.
         </div>
       )}
+      {error === "SessionExpired" && (
+        <div className="bg-amber-50 text-amber-800 p-3 rounded-lg text-xs sm:text-sm font-semibold border border-amber-200 text-center max-w-xs shadow-lg">
+          Your session has expired. Please sign in again.
+        </div>
+      )}
       <button
         onClick={() => signIn("google", { callbackUrl: "/" })}
         className="flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-6 py-4 sm:px-8 sm:py-4 rounded-full text-md font-bold transition-transform hover:scale-105 active:scale-95 shadow-2xl"
