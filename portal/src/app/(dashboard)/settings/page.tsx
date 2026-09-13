@@ -2,10 +2,14 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Settings, User, Mail, Shield, AlertTriangle, Bell } from "lucide-react";
+import { getUserPreferences } from "@/lib/user-preferences";
+import NotificationPreferencesSettingsForm from "@/components/NotificationPreferencesSettingsForm";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.strapiToken) redirect("/login");
+
+  const preferences = await getUserPreferences(session.strapiToken);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -82,21 +86,7 @@ export default async function SettingsPage() {
           <p className="text-sm text-slate-500 mt-1">Choose how and when you receive construction updates.</p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <div>
-              <p className="font-semibold text-slate-800">Email notifications for new updates</p>
-              <p className="text-xs text-slate-500 mt-0.5">Receive an email whenever a project milestone or log entry is published.</p>
-            </div>
-            <input
-              type="checkbox"
-              defaultChecked
-              disabled
-              className="h-5 w-5 rounded border-slate-300 text-teal-600 cursor-not-allowed opacity-75"
-            />
-          </div>
-          {/* TODO: Wire up customer notification preference toggles to Strapi user settings API */}
-        </div>
+        <NotificationPreferencesSettingsForm initialPreferences={preferences} />
       </div>
 
       {/* Danger Zone */}

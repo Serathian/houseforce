@@ -1,9 +1,21 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import Sidebar from "@/components/Sidebar";
+import { getUserPreferences } from "@/lib/user-preferences";
+import NotificationPreferencesModal from "@/components/NotificationPreferencesModal";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
+
+  let showNotificationPrompt = false;
+  let preferences = null;
+
+  if (session?.strapiToken) {
+    preferences = await getUserPreferences(session.strapiToken);
+    if (preferences && preferences.hasCompletedNotificationOnboarding === false) {
+      showNotificationPrompt = true;
+    }
+  }
 
   return (
     <div className="flex flex-row min-h-screen">
@@ -15,9 +27,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
           {children}
         </div>
       </main>
+
+      {showNotificationPrompt && (
+        <NotificationPreferencesModal
+          token={session?.strapiToken}
+          initialPreferences={preferences || undefined}
+        />
+      )}
     </div>
   );
 }
+
 
 
 

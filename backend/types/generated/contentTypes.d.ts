@@ -1132,12 +1132,20 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    hasCompletedNotificationOnboarding: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    notifyBlogPosts: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    notifyProjectUpdates: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    notifyUpdateMessages: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{

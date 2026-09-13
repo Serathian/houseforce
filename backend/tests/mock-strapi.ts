@@ -105,6 +105,16 @@ export function createMockStrapi() {
               const email = query?.where?.email;
               return store.admins.get(email) || null;
             }
+            if (model === 'plugin::users-permissions.user') {
+              const id = query?.where?.id;
+              const email = query?.where?.email;
+              if (id) {
+                return Array.from(store.clients.values()).find((c) => c.id === id) || null;
+              }
+              if (email) {
+                return store.clients.get(email) || null;
+              }
+            }
             return null;
           },
           async update(params: { where: any; data: any }) {
@@ -114,6 +124,14 @@ export function createMockStrapi() {
               if (existing) {
                 Object.assign(existing, params.data);
                 return existing;
+              }
+            }
+            if (model === 'plugin::users-permissions.user') {
+              const id = params.where?.id;
+              const client = Array.from(store.clients.values()).find((c) => c.id === id);
+              if (client) {
+                Object.assign(client, params.data);
+                return client;
               }
             }
             return null;

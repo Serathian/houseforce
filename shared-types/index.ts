@@ -34,3 +34,11 @@ export interface Category {
   slug: string;
   posts?: Post[];
 }
+
+export interface UserNotificationPreferences {
+  notifyProjectUpdates: boolean;
+  notifyUpdateMessages: boolean;
+  notifyBlogPosts: boolean;
+  hasCompletedNotificationOnboarding: boolean;
+}
+
