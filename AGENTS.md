@@ -38,14 +38,15 @@ Each subproject has a specialized `AGENTS.md` with domain-specific rules:
   * Always short-circuit empty result sets: if `allowedProjects.length === 0`, return `{ data: [], meta: { pagination: { total: 0 } } }` immediately to avoid SQL `WHERE id IN ()` syntax errors.
 
 ### Docker & Environment Strategy
-* **Explicit Compose Split**:
-  * [`docker-compose.yml`](./docker-compose.yml): Production base containing only `backend`, `frontend`, and `portal` in standalone runner mode, reading cloud database/S3 environment variables.
-  * [`docker-compose.local.yml`](./docker-compose.local.yml): Local development overrides adding PostgreSQL (`db`), MinIO local S3 (`minio`), volume mounts for hot reloading, and dev flags (`SEED_TEST_DATA`, `NEXT_PUBLIC_ENABLE_DEV_LOGIN`).
+* **Unified Development Compose**:
+  * [`docker-compose.yml`](./docker-compose.yml): Local development stack containing PostgreSQL (`db`), MinIO local S3 (`minio`), Strapi backend, Next.js marketing site (`frontend`), and Customer Portal (`portal`) with live code bind mounts, hot reloading, and dev flags (`SEED_TEST_DATA`, `NEXT_PUBLIC_ENABLE_DEV_LOGIN`).
 * **Starting the Stack Locally**:
   ```bash
   npm run dev
-  # Or: docker compose -f docker-compose.yml -f docker-compose.local.yml up
+  # Or: docker compose up
   ```
+* **Test and Production Orchestration**:
+  * Infrastructure, Traefik ingress, Let's Encrypt SSL, Watchtower CD, and production environments are strictly isolated in the sibling `houseforce-infra` repository.
 
 ### Authentication & Provider Handshake
 * Production customer portal accounts are **invitation-only**: Strapi admin creates the user with email; the lifecycle hook sets `provider = provider || 'google'`.
@@ -61,5 +62,5 @@ Before completing any task or proposing commits:
 1. **Backend Tests**: Run `npm test` (or `npm test -w backend`).
 2. **Typecheck**: Run `npm run typecheck` across all workspaces.
 3. **Lint**: Run `npm run lint` across all workspaces.
-4. **Compose Validation**: Run `docker compose -f docker-compose.yml -f docker-compose.local.yml config --quiet`.
+4. **Compose Validation**: Run `docker compose config --quiet`.
 5. **Git Hygiene**: Run `git status` to ensure no temporary scratch files or untracked `.env` files are left behind.

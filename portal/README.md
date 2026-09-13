@@ -28,7 +28,7 @@ The **HouseForce Customer Portal** is an authenticated web application built wit
 
 ## Environment Configuration
 
-Create a `.env.local` inside the `portal/` directory (or configure in `docker-compose.local.yml`):
+Create a `.env.local` inside the `portal/` directory (or configure in root `.env` / `docker-compose.yml`):
 
 ```bash
 GOOGLE_CLIENT_ID=your-google-client-id
@@ -46,7 +46,7 @@ To run the portal along with the full local stack (Postgres, Strapi, MinIO S3):
 ```bash
 # From repository root
 npm run dev
-# Or: docker compose -f docker-compose.yml -f docker-compose.local.yml up
+# Or: docker compose up
 ```
 
 ### Standalone Portal Commands

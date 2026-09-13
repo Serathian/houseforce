@@ -90,10 +90,10 @@ cp portal/.env.example portal/.env.local
 ```
 
 ### 3. Launch the Stack
-Use the root npm script (or explicit Docker Compose override):
+Use the root npm script (or native Docker Compose):
 ```bash
 npm run dev
-# Or: docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
+# Or: docker compose up
 ```
 
 Once running:
@@ -124,10 +124,16 @@ npm run test:api
 
 ---
 
-## Production Deployment
-
-In production, cloud-managed PostgreSQL and S3/DigitalOcean Spaces are used instead of local containers. Run:
+## Test & Production Deployment
+ 
+All production and test orchestration (Traefik reverse proxy, Watchtower auto-deploy, Let's Encrypt SSL, managed PostgreSQL, and DigitalOcean Spaces) is decoupled from this application repository and managed exclusively in the [`houseforce-infra`](../houseforce-infra/) repository.
+ 
+To deploy or preview staging/production:
 ```bash
-docker compose up -d --build
+# Refer to houseforce-infra repository
+cd ../houseforce-infra
+# Test environment:
+docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
+# Production environment:
+docker compose up -d
 ```
-This builds and runs production standalone runners for `backend`, `frontend`, and `portal` using environment variables supplied by the production host.

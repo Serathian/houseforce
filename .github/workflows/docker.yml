@@ -35,7 +35,9 @@ jobs:
         id: meta-frontend
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/houseforce-frontend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
@@ -54,7 +56,9 @@ jobs:
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cms
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cms
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/houseforce-backend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
@@ -69,7 +73,29 @@ jobs:
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
+      - name: Extract metadata for Portal
+        id: meta-portal
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/houseforce-portal
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      - name: Build and push Portal image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./portal
+          push: true
+          tags: ${{ steps.meta-portal.outputs.tags }}
+          labels: ${{ steps.meta-portal.outputs.labels }}
+          cache-from: type=gha,scope=portal
+          cache-to: type=gha,mode=max,scope=portal
+
       - name: Trigger Instant Watchtower Deploy
+        if: ${{ secrets.WATCHTOWER_TOKEN != '' }}
         run: |
           curl -H "Authorization: Bearer ${{ secrets.WATCHTOWER_TOKEN }}" \
-               -X POST https://deploy.jake-reddy.com/v1/update
+               -X POST ${{ secrets.WATCHTOWER_URL || 'https://deploy.jake-reddy.com/v1/update' }}
+
