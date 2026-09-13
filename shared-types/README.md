@@ -1,8 +1,30 @@
-# Shared TypeScript Definitions
+# `@houseforce/shared-types`
 
-This package contains shared TypeScript interfaces used across the HouseForce services (Frontend, Portal, Backend).
+This package contains shared TypeScript interfaces and models used across the HouseForce monorepo services (`frontend`, `portal`, and `backend`).
 
-## Types
+---
 
-* `Post`: Schema definition for marketing blog posts.
-* `Category`: Schema definition for blog and service categories.
+## Installation & Consumption
+
+As part of the NPM workspace, sibling packages consume this package directly:
+
+```json
+{
+  "dependencies": {
+    "@houseforce/shared-types": "*"
+  }
+}
+```
+
+```ts
+import type { Post, Category } from "@houseforce/shared-types";
+```
+
+---
+
+## Scripts
+
+```bash
+# Typecheck shared definitions
+npm run typecheck
+```

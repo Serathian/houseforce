@@ -50,6 +50,13 @@ This directory contains a complete [Bruno](https://www.usebruno.com/) API testin
 
 ## Running the Entire Suite
 
+### Option A: From Monorepo Root (Headless CLI)
+```bash
+# Run Bruno automated tests against local Strapi
+npm run test:api
+```
+
+### Option B: In the Bruno Desktop App
 1. Click on the collection name in the left sidebar: **Houseforce Email Service Desk**.
 2. Click **Run** at the top.
 3. Select the **Local** environment.

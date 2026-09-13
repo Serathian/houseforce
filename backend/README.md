@@ -35,12 +35,13 @@ The backend service is built on [Strapi 5](https://strapi.io/) with TypeScript, 
 ## Local Development & Testing
 
 ```bash
-# Typecheck and run all 24 native unit & lifecycle tests
-npm test
+# From repository root:
+npm test                   # Typecheck and run all 24 native tests
+npm run dev:backend        # Start Strapi in development mode
+npm run build:backend      # Build Strapi and admin panel
 
-# Run TypeScript check only
-npm run typecheck
-
-# Start Strapi in development mode (requires local PostgreSQL)
-npm run develop
+# From backend/ directory:
+npm test                   # Typecheck and run tests
+npm run develop            # Start Strapi develop server
+npm run build              # Build admin panel
 ```

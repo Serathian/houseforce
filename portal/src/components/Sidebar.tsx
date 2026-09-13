@@ -44,11 +44,12 @@ function NavLinks({ pathname }: { pathname: string }) {
 export default function Sidebar({ userName }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  // Close drawer on route change
-  useEffect(() => {
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setIsOpen(false);
-  }, [pathname]);
+  }
 
   // Lock body scroll while mobile drawer is open
   useEffect(() => {
