@@ -31,11 +31,21 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     ? (post.coverImage.url.startsWith('http') ? post.coverImage.url : `${strapiBase}${post.coverImage.url}`)
     : null;
 
+  const categories: Array<{ name: string; slug: string }> = [];
+  if (Array.isArray(post.categories) && post.categories.length > 0) {
+    categories.push(...post.categories);
+  }
+  if (post.category && !categories.some(c => c.name === post.category?.name || c.slug === post.category?.slug)) {
+    categories.push(post.category);
+  }
+
+  const categoryNamesStr = categories.map(c => c.name?.toLowerCase() || '').join(' ');
+
   // Determine team author details dynamically
   const authorName = post.authorName || (
-    post.category?.name?.toLowerCase().includes('keyholding') || post.title?.toLowerCase().includes('key') ? 'Paige Reddy' :
-    post.category?.name?.toLowerCase().includes('permit') || post.title?.toLowerCase().includes('license') ? 'Gabriel "Skippy"' :
-    post.category?.name?.toLowerCase().includes('tech') || post.title?.toLowerCase().includes('web') ? 'Jake Reddy' : 'Paul Reddy'
+    categoryNamesStr.includes('keyholding') || categoryNamesStr.includes('cleaning') || post.title?.toLowerCase().includes('key') ? 'Paige Reddy' :
+    categoryNamesStr.includes('permit') || categoryNamesStr.includes('planning') || post.title?.toLowerCase().includes('license') ? 'Gabriel "Skippy"' :
+    categoryNamesStr.includes('tech') || categoryNamesStr.includes('web') || post.title?.toLowerCase().includes('web') ? 'Jake Reddy' : 'Paul Reddy'
   );
 
   const authorRole = (
@@ -54,10 +64,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   return (
     <article className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 font-sans">
       <header className="mb-10 text-center">
-        {post.category && (
-          <span className="text-xs font-bold text-blue-900 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">
-            {post.category.name}
-          </span>
+        {categories.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {categories.map((c) => (
+              <span key={c.slug || c.name} className="text-xs font-bold text-blue-900 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full uppercase tracking-wider inline-block">
+                {c.name}
+              </span>
+            ))}
+          </div>
         )}
         <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">{post.title}</h1>
         

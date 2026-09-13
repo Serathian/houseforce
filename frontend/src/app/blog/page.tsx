@@ -15,6 +15,7 @@ interface StrapiPost {
   createdAt: string;
   authorName?: string;
   category?: StrapiCategory;
+  categories?: StrapiCategory[];
   coverImage?: { url: string };
 }
 
@@ -59,6 +60,18 @@ export default async function Blog({
   const posts = postsRes.data || [];
   const cmsCategoriesRaw = categoriesRes.data || [];
 
+  // Helper to extract all categories assigned to a post
+  const getPostCategories = (post: StrapiPost): StrapiCategory[] => {
+    const cats: StrapiCategory[] = [];
+    if (Array.isArray(post.categories) && post.categories.length > 0) {
+      cats.push(...post.categories);
+    }
+    if (post.category && !cats.some(c => c.name === post.category?.name || c.slug === post.category?.slug)) {
+      cats.push(post.category);
+    }
+    return cats;
+  };
+
   // Dynamically build category facets from CMS categories API & post data
   const dynamicCategoriesMap = new Map<string, { label: string; slug: string }>();
 
@@ -75,7 +88,10 @@ export default async function Blog({
   });
 
   posts.forEach((post: StrapiPost) => {
-    if (post.category?.name) addCat(post.category.name, post.category.slug);
+    const postCats = getPostCategories(post);
+    postCats.forEach((c) => {
+      if (c.name) addCat(c.name, c.slug);
+    });
   });
 
   // If a category was requested via search params (e.g. from service page icons),
@@ -97,18 +113,23 @@ export default async function Blog({
   const filteredPosts = activeCategory === 'all'
     ? posts
     : posts.filter((post: StrapiPost) => {
-        const catName = post.category?.name?.toLowerCase() || '';
-        const catSlug = post.category?.slug?.toLowerCase() || '';
+        const postCats = getPostCategories(post);
         const titleText = post.title?.toLowerCase() || '';
-        const sanitizedCatSlug = catName.replace(/\s+/g, '-');
-        return (
-          catName === activeCategory ||
-          catSlug === activeCategory ||
-          sanitizedCatSlug === activeCategory ||
-          catName.includes(activeCategory) ||
-          catSlug.includes(activeCategory) ||
-          titleText.includes(activeCategory)
-        );
+
+        const matchesCategory = postCats.some((c) => {
+          const catName = c.name?.toLowerCase() || '';
+          const catSlug = c.slug?.toLowerCase() || '';
+          const sanitizedCatSlug = catName.replace(/\s+/g, '-');
+          return (
+            catName === activeCategory ||
+            catSlug === activeCategory ||
+            sanitizedCatSlug === activeCategory ||
+            catName.includes(activeCategory) ||
+            catSlug.includes(activeCategory)
+          );
+        });
+
+        return matchesCategory || titleText.includes(activeCategory);
       });
 
   const featuredPost = filteredPosts.length > 0 ? filteredPosts[0] : null;
@@ -198,14 +219,14 @@ export default async function Blog({
                   </div>
                   <div className="lg:col-span-5 p-8 sm:p-10 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-3 mb-4">
-                        {featuredPost.category && (
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        {getPostCategories(featuredPost).map((cat) => (
+                          <span key={cat.slug || cat.name} className="inline-flex items-center gap-1 text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100">
                             <Tag className="w-3 h-3 text-blue-700" />
-                            {featuredPost.category.name}
+                            {cat.name}
                           </span>
-                        )}
-                        <span className="text-xs text-slate-400 font-medium inline-flex items-center gap-1">
+                        ))}
+                        <span className="text-xs text-slate-400 font-medium inline-flex items-center gap-1 ml-auto sm:ml-0">
                           <Calendar className="w-3.5 h-3.5" />
                           {new Date(featuredPost.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                         </span>
@@ -234,6 +255,7 @@ export default async function Blog({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {remainingPosts.map((post: StrapiPost) => {
                     const coverUrl = getImageUrl(post);
+                    const postCategories = getPostCategories(post);
                     return (
                       <Link href={`/blog/${post.slug}`} key={post.id} className="block group">
                         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col group-hover:-translate-y-1">
@@ -252,10 +274,14 @@ export default async function Blog({
                           </div>
                           <div className="p-6 flex-grow flex flex-col justify-between">
                             <div>
-                              {post.category && (
-                                <span className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2 block">
-                                  {post.category.name}
-                                </span>
+                              {postCategories.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                  {postCategories.map((c) => (
+                                    <span key={c.slug || c.name} className="text-[11px] font-bold text-blue-800 bg-blue-50/70 border border-blue-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                      {c.name}
+                                    </span>
+                                  ))}
+                                </div>
                               )}
                               <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-900 transition-colors leading-snug">
                                 {post.title}
