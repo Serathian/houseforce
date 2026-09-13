@@ -107,21 +107,60 @@ function parseYouTubeAtomFeed(xml: string): YouTubeVideo[] {
   return videos;
 }
 
+async function resolveChannelId(input: string): Promise<string | null> {
+  const trimmed = input.trim();
+  if (trimmed.startsWith('UC')) {
+    return trimmed;
+  }
+
+  const handle = trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
+  try {
+    const res = await fetch(`https://www.youtube.com/${handle}`, {
+      next: { revalidate: 86400 },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; HouseForceBot/1.0)',
+      },
+    });
+
+    if (!res.ok) return null;
+    const html = await res.text();
+    const match =
+      html.match(/"externalId":"(UC[a-zA-Z0-9_-]+)"/) ||
+      html.match(/channel_id=(UC[a-zA-Z0-9_-]+)/);
+
+    return match ? match[1] : null;
+  } catch (err) {
+    console.warn('[YouTube Feed] Failed to resolve handle to channel ID:', err);
+    return null;
+  }
+}
+
 /**
  * Fetches the latest YouTube videos from the public channel Atom/RSS feed.
- * Configured via YOUTUBE_CHANNEL_ID (or YOUTUBE_FEED_URL).
+ * Configured via YOUTUBE_CHANNEL_ID, YOUTUBE_HANDLE, or YOUTUBE_FEED_URL.
+ * Supports both raw channel IDs (e.g. UCFVYXzp-BW5CxFI5GEdCZww) and handles (@HouseForceBiz).
  * If neither is configured, returns an empty array.
  */
 export async function getYouTubeFeed(): Promise<YouTubeVideo[]> {
   const feedUrl = process.env.YOUTUBE_FEED_URL;
-  const channelId = process.env.YOUTUBE_CHANNEL_ID;
+  const rawInput = process.env.YOUTUBE_CHANNEL_ID || process.env.YOUTUBE_HANDLE;
   const revalidateSeconds = Number(process.env.YOUTUBE_CACHE_REVALIDATE) || 3600; // 1 hour default
 
-  if (!feedUrl && !channelId) {
+  if (!feedUrl && !rawInput) {
     return [];
   }
 
-  const targetUrl = feedUrl || `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+  let targetUrl = feedUrl;
+  if (!targetUrl && rawInput) {
+    const channelId = await resolveChannelId(rawInput);
+    if (!channelId) {
+      console.warn('[YouTube Feed] Could not resolve channel ID for input:', rawInput);
+      return [];
+    }
+    targetUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+  }
+
+  if (!targetUrl) return [];
 
   try {
     const res = await fetch(targetUrl, {
@@ -144,3 +183,4 @@ export async function getYouTubeFeed(): Promise<YouTubeVideo[]> {
     return [];
   }
 }
+
