@@ -91,11 +91,14 @@ export default function Home() {
         
         {/* Left Background (Construction - Blue) */}
         <motion.div 
-          className="absolute inset-0 w-full h-full group"
+          className={`absolute inset-0 w-full h-full group ${expandedSide === null || expandedSide === 'right' ? 'cursor-pointer' : ''}`}
           initial={false}
           animate={{ clipPath: clipStrLeft }}
           transition={swipeTransition}
-          onClick={() => expandedSide === 'right' && handleReset()}
+          onClick={() => {
+            if (expandedSide === 'right') handleReset();
+            else if (expandedSide === null) setExpandedSide('left');
+          }}
           onMouseEnter={() => expandedSide === 'right' && setHoveredEdge('left')}
           onMouseLeave={() => expandedSide === 'right' && setHoveredEdge(null)}
         >
@@ -130,11 +133,14 @@ export default function Home() {
 
         {/* Right Background (Keyholding - Teal) */}
         <motion.div 
-          className="absolute inset-0 w-full h-full group"
+          className={`absolute inset-0 w-full h-full group ${expandedSide === null || expandedSide === 'left' ? 'cursor-pointer' : ''}`}
           initial={false}
           animate={{ clipPath: clipStrRight }}
           transition={swipeTransition}
-          onClick={() => expandedSide === 'left' && handleReset()}
+          onClick={() => {
+            if (expandedSide === 'left') handleReset();
+            else if (expandedSide === null) setExpandedSide('right');
+          }}
           onMouseEnter={() => expandedSide === 'left' && setHoveredEdge('right')}
           onMouseLeave={() => expandedSide === 'left' && setHoveredEdge(null)}
         >
@@ -197,12 +203,22 @@ export default function Home() {
                   </p>
 
                   <div className="pointer-events-auto">
-                    <Link 
-                      href="/services/construction"
-                      className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm font-medium py-2 px-4 rounded-full text-xs shadow-sm md:bg-white md:text-blue-900 md:border-transparent md:font-bold md:py-4 md:px-8 md:text-base md:shadow-xl md:hover:bg-blue-50 md:hover:scale-105 transition-all"
-                    >
-                      Explore Construction <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
-                    </Link>
+                    {expandedSide === 'left' ? (
+                      <Link 
+                        href="/services/construction"
+                        className="inline-flex items-center bg-white text-blue-900 border border-transparent font-bold py-2.5 px-5 text-xs sm:text-sm md:text-base rounded-full shadow-xl hover:bg-blue-50 hover:scale-105 transition-all md:py-4 md:px-8"
+                      >
+                        Explore Full Services <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                      </Link>
+                    ) : (
+                      <button 
+                        type="button"
+                        onClick={() => setExpandedSide('left')}
+                        className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-md font-medium py-2 px-4 rounded-full text-xs sm:text-sm md:text-base md:py-3 md:px-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
+                      >
+                        Explore Construction <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -228,12 +244,22 @@ export default function Home() {
                   </p>
 
                   <div className="pointer-events-auto">
-                    <Link 
-                      href="/services/keyholding"
-                      className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm font-medium py-2 px-4 rounded-full text-xs shadow-sm md:bg-white md:text-teal-900 md:border-transparent md:font-bold md:py-4 md:px-8 md:text-base md:shadow-xl md:hover:bg-teal-50 md:hover:scale-105 transition-all"
-                    >
-                      Explore Keyholding <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
-                    </Link>
+                    {expandedSide === 'right' ? (
+                      <Link 
+                        href="/services/keyholding"
+                        className="inline-flex items-center bg-white text-teal-900 border border-transparent font-bold py-2.5 px-5 text-xs sm:text-sm md:text-base rounded-full shadow-xl hover:bg-teal-50 hover:scale-105 transition-all md:py-4 md:px-8"
+                      >
+                        Explore Full Services <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                      </Link>
+                    ) : (
+                      <button 
+                        type="button"
+                        onClick={() => setExpandedSide('right')}
+                        className="inline-flex items-center bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-md font-medium py-2 px-4 rounded-full text-xs sm:text-sm md:text-base md:py-3 md:px-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
+                      >
+                        Explore Keyholding <ArrowRight className="ml-1.5 w-3.5 h-3.5 md:ml-2 md:w-5 md:h-5" />
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}

@@ -40,6 +40,13 @@ export default function SpinningWheel({ expandedSide, setExpandedSide, swipeTran
     return () => cancelAnimationFrame(animationFrameId);
   }, [isHovered, expandedSide, rotateMV, counterRotateMV]);
 
+  useEffect(() => {
+    if (expandedSide) {
+      animate(rotateMV, 0, swipeTransition);
+      animate(counterRotateMV, 0, swipeTransition);
+    }
+  }, [expandedSide, rotateMV, counterRotateMV, swipeTransition]);
+
   const handleMouseEnter = (e: React.MouseEvent, text: string, side: 'left' | 'right') => {
     if (expandedSide) return;
     setIsHovered(true);
