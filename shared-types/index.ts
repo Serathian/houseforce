@@ -4,7 +4,8 @@ export interface Post {
   title: string;
   slug: string;
   content: string; // rich text or markdown depending on Strapi config
-  category?: Category;
+  categories?: Category[];
+  category?: Category; // Deprecated single category backward compatibility
   coverImage?: any; // Will refine based on Strapi upload type
   publishedAt: string;
   createdAt: string;
