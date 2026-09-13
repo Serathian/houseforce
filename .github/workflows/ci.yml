@@ -90,6 +90,11 @@ jobs:
           ADMIN_JWT_SECRET: testAdminJwtSecret
           TRANSFER_TOKEN_SALT: testTransferTokenSalt
           JWT_SECRET: testJwtSecret1234567890
+          DO_SPACE_ACCESS_KEY: testAccessKey
+          DO_SPACE_SECRET_KEY: testSecretKey
+          DO_SPACE_ENDPOINT: http://localhost:9000
+          DO_SPACE_BUCKET: uploads
+          DO_SPACE_REGION: us-east-1
           EMAIL_DOMAIN: replies.houseforce.com
           EMAIL_DEFAULT_FROM: updates@replies.houseforce.com
           POSTMARK_API_TOKEN: mock-test-token

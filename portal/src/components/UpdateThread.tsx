@@ -23,12 +23,14 @@ export function UpdateThread({ updateId, initialMessages = [], token }: UpdateTh
   const [messages, setMessages] = useState<UpdateMessage[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newMessage.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
       
@@ -40,7 +42,7 @@ export function UpdateThread({ updateId, initialMessages = [], token }: UpdateTh
         },
         body: JSON.stringify({
           data: {
-            content: newMessage,
+            content: newMessage.trim(),
             authorType: 'client',
             update: updateId,
           }
@@ -59,10 +61,13 @@ export function UpdateThread({ updateId, initialMessages = [], token }: UpdateTh
         setMessages((prev) => [...prev, createdMessage]);
         setNewMessage('');
       } else {
-        console.error('Failed to post message', await res.text());
+        const errorText = await res.text().catch(() => '');
+        console.error('Failed to post message', errorText);
+        setError('Unable to send your reply. Please try again.');
       }
-    } catch (error) {
-      console.error('Error posting message:', error);
+    } catch (err) {
+      console.error('Error posting message:', err);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -111,21 +116,35 @@ export function UpdateThread({ updateId, initialMessages = [], token }: UpdateTh
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Reply to this update..."
-          className="flex-1 rounded-xl border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 min-h-[60px] resize-none"
-          disabled={isSubmitting}
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting || !newMessage.trim()}
-          className="bg-teal-600 text-white p-3 rounded-xl hover:bg-teal-700 transition-colors disabled:opacity-50 shrink-0 self-end flex items-center justify-center"
-        >
-          <Send className="w-5 h-5" />
-        </button>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+        {error && (
+          <p className="text-xs font-semibold text-red-600 bg-red-50 border border-red-100 rounded-lg p-2.5">
+            {error}
+          </p>
+        )}
+        <div className="flex gap-3">
+          <textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+            placeholder="Reply to this update... (Press Cmd+Enter to send)"
+            className="flex-1 rounded-xl border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 min-h-[60px] resize-none"
+            disabled={isSubmitting}
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting || !newMessage.trim()}
+            className="bg-teal-600 text-white p-3 rounded-xl hover:bg-teal-700 transition-colors disabled:opacity-50 shrink-0 self-end flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+            title="Send reply (Cmd+Enter)"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
       </form>
     </div>
   );
