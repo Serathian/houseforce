@@ -593,6 +593,8 @@ export interface ApiUpdateUpdate extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    clientNotified: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     content: Schema.Attribute.RichText;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

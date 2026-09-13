@@ -37,6 +37,10 @@
       "relation": "oneToMany",
       "target": "api::update-message.update-message",
       "mappedBy": "update"
+    },
+    "clientNotified": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
