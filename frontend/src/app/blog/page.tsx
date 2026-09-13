@@ -1,8 +1,10 @@
+import { Fragment } from 'react';
 import { Link } from 'next-view-transitions';
 import { ArrowRight, Pin, Clock } from 'lucide-react';
 import { constItems, keyItems } from '@/data/services';
 import CategoryAnchorCard from '@/components/blog/CategoryAnchorCard';
 import BlogCard from '@/components/blog/BlogCard';
+import InstagramBannerCard from '@/components/blog/InstagramBannerCard';
 
 interface StrapiAuthor {
   name: string;
@@ -201,6 +203,8 @@ export default async function Blog({
       : `/blog?category=${activeCategory}`;
   };
 
+  const INSTAGRAM_FEED_INTERVAL = Number(process.env.NEXT_PUBLIC_INSTAGRAM_FEED_INTERVAL) || 6;
+
   return (
     <div className="bg-slate-50 min-h-screen py-20 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -282,22 +286,28 @@ export default async function Blog({
 
         {/* Main Content Area */}
         {posts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
-            <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
+          <div className="space-y-12">
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
+              <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
+            </div>
+            <InstagramBannerCard />
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs in This Category Yet</h3>
-            <p className="text-slate-500 font-light text-sm mb-6">
-              We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
-            >
-              View All Showcases <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="space-y-12">
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs in This Category Yet</h3>
+              <p className="text-slate-500 font-light text-sm mb-6">
+                We haven&apos;t published case studies for this specific service category yet. Check back soon or view all our completed project logs.
+              </p>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                View All Showcases <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <InstagramBannerCard />
           </div>
         ) : activeView === 'pinned' ? (
           /* "All Pinned" View State */
@@ -310,27 +320,39 @@ export default async function Blog({
             </div>
 
             {pinnedPosts.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md mx-auto shadow-sm">
-                <p className="text-slate-500 font-light text-sm mb-4">No pinned project logs currently found in this category.</p>
-                <Link
-                  href={getViewHref('recent')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 hover:underline"
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Switch back to Most Recent</span>
-                </Link>
+              <div className="space-y-12">
+                <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-md mx-auto shadow-sm">
+                  <p className="text-slate-500 font-light text-sm mb-4">No pinned project logs currently found in this category.</p>
+                  <Link
+                    href={getViewHref('recent')}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-900 hover:underline"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Switch back to Most Recent</span>
+                  </Link>
+                </div>
+                <InstagramBannerCard />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {pinnedPosts.map((post: StrapiPost) => (
-                  <BlogCard 
-                    key={post.id}
-                    post={post}
-                    categories={getPostCategories(post)}
-                    imageUrl={getImageUrl(post)}
-                    strapiBase={strapiBase}
-                  />
-                ))}
+                {pinnedPosts.map((post: StrapiPost, index: number) => {
+                  const bannerTargetIndex = Math.min(INSTAGRAM_FEED_INTERVAL - 1, pinnedPosts.length - 1);
+                  const showBannerOnce = index === bannerTargetIndex;
+
+                  return (
+                    <Fragment key={post.id}>
+                      <BlogCard 
+                        post={post}
+                        categories={getPostCategories(post)}
+                        imageUrl={getImageUrl(post)}
+                        strapiBase={strapiBase}
+                      />
+                      {showBannerOnce && (
+                        <InstagramBannerCard />
+                      )}
+                    </Fragment>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -362,24 +384,36 @@ export default async function Blog({
             )}
 
             {/* Standard Posts in Chronological Order */}
-            {regularPosts.length > 0 && (
+            {regularPosts.length > 0 ? (
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-6 tracking-tight">
                   {activeCategory !== 'all' ? `More ${activeCategoryLabel} Project Logs` : 'Recent Project Logs & Updates'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {regularPosts.map((post: StrapiPost) => (
-                    <BlogCard 
-                      key={post.id}
-                      post={post}
-                      categories={getPostCategories(post)}
-                      imageUrl={getImageUrl(post)}
-                      strapiBase={strapiBase}
-                    />
-                  ))}
+                  {regularPosts.map((post: StrapiPost, index: number) => {
+                    const bannerTargetIndex = Math.min(INSTAGRAM_FEED_INTERVAL - 1, regularPosts.length - 1);
+                    const showBannerOnce = index === bannerTargetIndex;
+
+                    return (
+                      <Fragment key={post.id}>
+                        <BlogCard 
+                          post={post}
+                          categories={getPostCategories(post)}
+                          imageUrl={getImageUrl(post)}
+                          strapiBase={strapiBase}
+                        />
+                        {showBannerOnce && (
+                          <InstagramBannerCard />
+                        )}
+                      </Fragment>
+                    );
+                  })}
                 </div>
               </div>
-            )}
+            ) : pinnedPosts.length > 0 ? (
+              /* If only pinned posts exist in this view, render Instagram banner below */
+              <InstagramBannerCard />
+            ) : null}
           </div>
         )}
       </div>
