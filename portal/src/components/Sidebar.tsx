@@ -2,41 +2,84 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "next-view-transitions";
-import { LogOut, Home, Settings, Hammer, Menu, X } from "lucide-react";
+import { LogOut, Home, Settings, Hammer, Menu, X, Bell } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useNotifications } from "./NotificationsContext";
 
 interface SidebarProps {
   userName?: string | null;
 }
 
-const navLinks = [
-  { href: "/", label: "Dashboard", icon: Home },
-  { href: "/projects", label: "Projects", icon: Hammer },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
-
 /** Shared nav link list used by both the drawer and the static sidebar. */
-function NavLinks({ pathname }: { pathname: string }) {
+function NavLinks({
+  pathname,
+  onNotificationClick,
+}: {
+  pathname: string;
+  onNotificationClick?: () => void;
+}) {
+  const { unreadCount } = useNotifications();
+
   return (
     <>
-      {navLinks.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href;
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
-              isActive
-                ? "bg-blue-950 text-white shadow-sm hover:bg-blue-900"
-                : "text-slate-600 hover:bg-slate-50 hover:text-blue-900"
-            }`}
-          >
-            <Icon className={`w-5 h-5 ${isActive ? "text-blue-300" : "text-slate-400"}`} />
-            {label}
-          </Link>
-        );
-      })}
+      <Link
+        href="/"
+        className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
+          pathname === "/"
+            ? "bg-blue-950 text-white shadow-sm hover:bg-blue-900"
+            : "text-slate-600 hover:bg-slate-50 hover:text-blue-900"
+        }`}
+      >
+        <Home className={`w-5 h-5 ${pathname === "/" ? "text-blue-300" : "text-slate-400"}`} />
+        <span>Dashboard</span>
+      </Link>
+
+      <Link
+        href="/projects"
+        className={`flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
+          pathname.startsWith("/projects")
+            ? "bg-blue-950 text-white shadow-sm hover:bg-blue-900"
+            : "text-slate-600 hover:bg-slate-50 hover:text-blue-900"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <Hammer className={`w-5 h-5 ${pathname.startsWith("/projects") ? "text-blue-300" : "text-slate-400"}`} />
+          <span>Projects</span>
+        </div>
+        {unreadCount > 0 && (
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+        )}
+      </Link>
+
+      {/* Notification feed trigger */}
+      <button
+        type="button"
+        onClick={onNotificationClick}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-900 transition-all cursor-pointer group"
+      >
+        <div className="flex items-center gap-3">
+          <Bell className="w-5 h-5 text-slate-400 group-hover:text-blue-900 transition-colors" />
+          <span>Notifications</span>
+        </div>
+        {unreadCount > 0 && (
+          <span className="bg-amber-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full animate-pulse shadow-xs">
+            {unreadCount}
+          </span>
+        )}
+      </button>
+
+      <Link
+        href="/settings"
+        className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
+          pathname === "/settings"
+            ? "bg-blue-950 text-white shadow-sm hover:bg-blue-900"
+            : "text-slate-600 hover:bg-slate-50 hover:text-blue-900"
+        }`}
+      >
+        <Settings className={`w-5 h-5 ${pathname === "/settings" ? "text-blue-300" : "text-slate-400"}`} />
+        <span>Settings</span>
+      </Link>
     </>
   );
 }
@@ -45,11 +88,17 @@ export default function Sidebar({ userName }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
+  const { unreadCount, openDrawer } = useNotifications();
 
   if (prevPathname !== pathname) {
     setPrevPathname(pathname);
     setIsOpen(false);
   }
+
+  const handleMobileNotificationClick = () => {
+    setIsOpen(false);
+    openDrawer();
+  };
 
   // Lock body scroll while mobile drawer is open
   useEffect(() => {
@@ -86,7 +135,7 @@ export default function Sidebar({ userName }: SidebarProps) {
 
         {/* Nav links */}
         <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
-          <NavLinks pathname={pathname} />
+          <NavLinks pathname={pathname} onNotificationClick={openDrawer} />
         </nav>
 
         {/* Sign out */}
@@ -109,9 +158,14 @@ export default function Sidebar({ userName }: SidebarProps) {
       <button
         onClick={() => setIsOpen(true)}
         aria-label="Open navigation menu"
-        className="lg:hidden fixed bottom-5 right-5 z-40 flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-md px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 hover:shadow-lg transition-all duration-200 active:scale-95"
+        className="lg:hidden fixed bottom-5 right-5 z-40 flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-md px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 hover:shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
       >
-        <Menu className="w-5 h-5" />
+        <div className="relative">
+          <Menu className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white animate-pulse" />
+          )}
+        </div>
         <span className="text-sm font-bold text-blue-900 tracking-tight hidden sm:inline">
           House<span className="text-teal-600">Force</span><span className="text-amber-500">.</span>
         </span>
@@ -162,7 +216,7 @@ export default function Sidebar({ userName }: SidebarProps) {
 
         {/* Nav links */}
         <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
-          <NavLinks pathname={pathname} />
+          <NavLinks pathname={pathname} onNotificationClick={handleMobileNotificationClick} />
         </nav>
 
         {/* Sign out */}

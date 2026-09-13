@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from 'next-view-transitions';
 import SupportTriggerButton from "@/components/SupportTriggerButton";
+import ProjectUnreadBadge from "@/components/ProjectUnreadBadge";
 
 
 // Types based on the Strapi schema we built
@@ -107,10 +108,11 @@ export default async function DashboardPage() {
             <div key={project.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <span className="bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                       {project.projectStatus.replace('-', ' ')}
                     </span>
+                    <ProjectUnreadBadge projectDocumentId={project.documentId} />
                     <span className="text-slate-400 text-sm font-medium">
                       Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
                     </span>

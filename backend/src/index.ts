@@ -62,6 +62,8 @@ export default {
           'api::update-message.update-message.find',
           'api::user-preference.user-preference.getPreferences',
           'api::user-preference.user-preference.updatePreferences',
+          'api::notification.notification.getNotifications',
+          'api::notification.notification.markAsRead',
         ];
 
         for (const action of authActions) {

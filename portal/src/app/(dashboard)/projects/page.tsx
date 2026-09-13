@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Link } from 'next-view-transitions';
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Hammer, MapPin, ChevronRight } from "lucide-react";
+import ProjectUnreadBadge from "@/components/ProjectUnreadBadge";
 
 interface Project {
   id: number;
@@ -72,7 +73,7 @@ export default async function ProjectsPage() {
               href={`/projects/${project.documentId}`}
               className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group flex flex-col h-full"
             >
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-center gap-2 mb-4 flex-wrap">
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
                   project.projectStatus === 'in-progress' ? 'bg-amber-100 text-amber-800' :
                   project.projectStatus === 'completed' ? 'bg-emerald-100 text-emerald-800' :
@@ -81,6 +82,7 @@ export default async function ProjectsPage() {
                 }`}>
                   {project.projectStatus.replace('-', ' ')}
                 </span>
+                <ProjectUnreadBadge projectDocumentId={project.documentId} />
               </div>
               
               <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-900 transition-colors mb-2">

@@ -98,12 +98,60 @@ export function createMockStrapi() {
               }
               return Array.from(store.admins.values()).filter((a) => (query?.where?.isActive !== undefined ? a.isActive === query.where.isActive : true));
             }
+            if (model === 'api::project.project') {
+              const clientId = query?.where?.clients;
+              return Array.from(store.projects.values()).filter((p) => {
+                if (clientId !== undefined) {
+                  return p.clients?.some((c: any) => (typeof c === 'object' ? c.id === clientId : c === clientId));
+                }
+                return true;
+              });
+            }
+            if (model === 'api::update.update') {
+              const projectWhere = query?.where?.project;
+              const projectIds = projectWhere?.id?.$in;
+              const singleProjectId = projectWhere?.id;
+              let list = Array.from(store.updates.values());
+              if (Array.isArray(projectIds)) {
+                list = list.filter((u) => {
+                  const pId = u.project?.id || (typeof u.project === 'number' ? u.project : undefined);
+                  return projectIds.includes(pId);
+                });
+              } else if (singleProjectId !== undefined) {
+                list = list.filter((u) => {
+                  const pId = u.project?.id || (typeof u.project === 'number' ? u.project : undefined);
+                  return pId === singleProjectId;
+                });
+              }
+              if (query?.where?.publishedAt?.$notNull) {
+                list = list.filter((u) => u.publishedAt);
+              }
+              // attach messages if requested
+              return list.map((u) => {
+                const msgs = Array.from(store.updateMessages.values()).filter((m) => {
+                  const uId = m.update?.id || (typeof m.update === 'number' ? m.update : undefined);
+                  return uId === u.id;
+                });
+                return { ...u, messages: msgs };
+              });
+            }
             return [];
           },
           async findOne(query?: any) {
             if (model === 'admin::user') {
               const email = query?.where?.email;
               return store.admins.get(email) || null;
+            }
+            if (model === 'api::project.project') {
+              const docId = query?.where?.documentId;
+              const id = query?.where?.id;
+              const clientId = query?.where?.clients;
+              return Array.from(store.projects.values()).find((p) => {
+                if (docId && p.documentId !== docId) return false;
+                if (id && p.id !== id) return false;
+                if (clientId !== undefined && !p.clients?.some((c: any) => (typeof c === 'object' ? c.id === clientId : c === clientId))) return false;
+                return true;
+              }) || null;
             }
             if (model === 'plugin::users-permissions.user') {
               const id = query?.where?.id;
