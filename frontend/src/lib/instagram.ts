@@ -1,9 +1,36 @@
-import {
-  houseforceInstagramFeed,
-  houseforceInstagramProfile,
-  type InstagramPost,
-  type InstagramProfile,
-} from '@/data/instagram';
+export interface InstagramPost {
+  id: string;
+  title?: string;
+  imageUrl: string;
+  caption: string;
+  likes: number;
+  comments: number;
+  permalink: string;
+  timestamp: string;
+  tag: string;
+  location?: string;
+  likedBy?: string;
+}
+
+export interface InstagramProfile {
+  handle: string;
+  displayName: string;
+  avatarUrl: string;
+  bio: string;
+  followersCount: string;
+  postsCount: number;
+  profileUrl: string;
+}
+
+export const defaultInstagramProfile: InstagramProfile = {
+  handle: 'houseforcespain',
+  displayName: 'HouseForce',
+  avatarUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=200&auto=format&fit=crop',
+  bio: 'British craftsmanship & dedicated property care in Torrevieja. Full villa reforms, luxury kitchens & trusted keyholding. 🔨🔑',
+  followersCount: '2.8k',
+  postsCount: 194,
+  profileUrl: 'https://www.instagram.com/houseforcespain',
+};
 
 interface RawInstagramMediaItem {
   id: string;
@@ -85,16 +112,16 @@ function parsePostContent(caption: string = ''): { title: string; tag: string; c
 
 /**
  * Fetches the live Instagram feed from Instagram Graph API or an external webhook/proxy URL.
- * Falls back gracefully to curated local posts if the token is unconfigured, expired, or rate-limited.
+ * If no access token or feed URL is configured, returns an empty array (feed is not displayed).
  */
 export async function getInstagramFeed(): Promise<InstagramPost[]> {
   const customFeedUrl = process.env.INSTAGRAM_FEED_URL;
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
   const revalidateSeconds = Number(process.env.INSTAGRAM_CACHE_REVALIDATE) || 3600; // 1 hour default
 
-  // If no live feed configuration is present, return the curated fallback feed
+  // If no live feed configuration is present, do not display the feed
   if (!customFeedUrl && !accessToken) {
-    return houseforceInstagramFeed;
+    return [];
   }
 
   try {
@@ -108,18 +135,18 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
     if (!res.ok) {
       const errorText = await res.text();
       console.warn(`[Instagram Feed] Live fetch failed (${res.status}):`, errorText);
-      return houseforceInstagramFeed;
+      return [];
     }
 
     const payload: InstagramApiResponse = await res.json();
 
     if (payload.error) {
       console.warn('[Instagram Feed] API returned error:', payload.error.message);
-      return houseforceInstagramFeed;
+      return [];
     }
 
     if (!payload.data || !Array.isArray(payload.data) || payload.data.length === 0) {
-      return houseforceInstagramFeed;
+      return [];
     }
 
     // Transform live Instagram items to InstagramPost interface
@@ -137,8 +164,8 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
           title,
           imageUrl,
           caption: cleanCaption,
-          likes: typeof item.like_count === 'number' ? item.like_count : (120 + (index * 17) % 80),
-          comments: typeof item.comments_count === 'number' ? item.comments_count : (10 + (index * 5) % 30),
+          likes: typeof item.like_count === 'number' ? item.like_count : 0,
+          comments: typeof item.comments_count === 'number' ? item.comments_count : 0,
           permalink: item.permalink || 'https://www.instagram.com/houseforcespain',
           timestamp: formatRelativeTime(item.timestamp),
           tag,
@@ -146,10 +173,10 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
         };
       });
 
-    return transformedPosts.length > 0 ? transformedPosts : houseforceInstagramFeed;
+    return transformedPosts;
   } catch (error) {
     console.error('[Instagram Feed] Network error during live fetch:', error);
-    return houseforceInstagramFeed;
+    return [];
   }
 }
 
@@ -159,7 +186,7 @@ export async function getInstagramFeed(): Promise<InstagramPost[]> {
 export async function getInstagramProfile(): Promise<InstagramProfile> {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
   if (!accessToken) {
-    return houseforceInstagramProfile;
+    return defaultInstagramProfile;
   }
 
   try {
@@ -172,9 +199,9 @@ export async function getInstagramProfile(): Promise<InstagramProfile> {
       const data = await res.json();
       if (data.username) {
         return {
-          ...houseforceInstagramProfile,
+          ...defaultInstagramProfile,
           handle: data.username,
-          postsCount: data.media_count || houseforceInstagramProfile.postsCount,
+          postsCount: data.media_count || defaultInstagramProfile.postsCount,
         };
       }
     }
@@ -182,5 +209,5 @@ export async function getInstagramProfile(): Promise<InstagramProfile> {
     // Ignore error and fall back
   }
 
-  return houseforceInstagramProfile;
+  return defaultInstagramProfile;
 }

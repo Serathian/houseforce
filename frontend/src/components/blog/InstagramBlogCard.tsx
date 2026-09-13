@@ -1,9 +1,9 @@
 import { Heart, MessageCircle, Send, Bookmark, MapPin, ArrowUpRight } from 'lucide-react';
 import {
-  houseforceInstagramProfile,
+  defaultInstagramProfile,
   type InstagramPost,
   type InstagramProfile,
-} from '@/data/instagram';
+} from '@/lib/instagram';
 
 interface InstagramBlogCardProps {
   post: InstagramPost;
@@ -12,7 +12,7 @@ interface InstagramBlogCardProps {
 
 export default function InstagramBlogCard({
   post,
-  profile = houseforceInstagramProfile,
+  profile = defaultInstagramProfile,
 }: InstagramBlogCardProps) {
   const handle = process.env.NEXT_PUBLIC_INSTAGRAM_HANDLE || profile.handle;
   const profileUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || profile.profileUrl;

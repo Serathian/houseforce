@@ -293,9 +293,11 @@ export default async function Blog({
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Project Logs Posted Yet</h3>
               <p className="text-slate-500 font-light text-sm">Check back soon for our latest project photos and updates from around Torrevieja.</p>
             </div>
-            <div className="max-w-md mx-auto">
-              <InstagramBlogCard post={instagramFeed[0]} />
-            </div>
+            {instagramFeed.length > 0 && (
+              <div className="max-w-md mx-auto">
+                <InstagramBlogCard post={instagramFeed[0]} />
+              </div>
+            )}
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="space-y-12">
@@ -311,9 +313,11 @@ export default async function Blog({
                 View All Showcases <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="max-w-md mx-auto">
-              <InstagramBlogCard post={instagramFeed[0]} />
-            </div>
+            {instagramFeed.length > 0 && (
+              <div className="max-w-md mx-auto">
+                <InstagramBlogCard post={instagramFeed[0]} />
+              </div>
+            )}
           </div>
         ) : activeView === 'pinned' ? (
           /* "All Pinned" View State */
@@ -337,17 +341,20 @@ export default async function Blog({
                     <span>Switch back to Most Recent</span>
                   </Link>
                 </div>
-                <div className="max-w-md mx-auto">
-                  <InstagramBlogCard post={instagramFeed[0]} />
-                </div>
+                {instagramFeed.length > 0 && (
+                  <div className="max-w-md mx-auto">
+                    <InstagramBlogCard post={instagramFeed[0]} />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {pinnedPosts.map((post: StrapiPost, index: number) => {
                   const shouldShowInstagramCard =
-                    (index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
-                    (pinnedPosts.length < INSTAGRAM_FEED_INTERVAL && index === pinnedPosts.length - 1);
-                  const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % instagramFeed.length;
+                    instagramFeed.length > 0 &&
+                    ((index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
+                      (pinnedPosts.length < INSTAGRAM_FEED_INTERVAL && index === pinnedPosts.length - 1));
+                  const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % Math.max(1, instagramFeed.length);
                   const igPost = instagramFeed[igIndex] || instagramFeed[0];
 
                   return (
@@ -358,7 +365,7 @@ export default async function Blog({
                         imageUrl={getImageUrl(post)}
                         strapiBase={strapiBase}
                       />
-                      {shouldShowInstagramCard && (
+                      {shouldShowInstagramCard && igPost && (
                         <InstagramBlogCard post={igPost} />
                       )}
                     </Fragment>
@@ -403,9 +410,10 @@ export default async function Blog({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {regularPosts.map((post: StrapiPost, index: number) => {
                     const shouldShowInstagramCard =
-                      (index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
-                      (regularPosts.length < INSTAGRAM_FEED_INTERVAL && index === regularPosts.length - 1);
-                    const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % instagramFeed.length;
+                      instagramFeed.length > 0 &&
+                      ((index + 1) % INSTAGRAM_FEED_INTERVAL === 0 ||
+                        (regularPosts.length < INSTAGRAM_FEED_INTERVAL && index === regularPosts.length - 1));
+                    const igIndex = Math.floor(index / INSTAGRAM_FEED_INTERVAL) % Math.max(1, instagramFeed.length);
                     const igPost = instagramFeed[igIndex] || instagramFeed[0];
 
                     return (
@@ -416,7 +424,7 @@ export default async function Blog({
                           imageUrl={getImageUrl(post)}
                           strapiBase={strapiBase}
                         />
-                        {shouldShowInstagramCard && (
+                        {shouldShowInstagramCard && igPost && (
                           <InstagramBlogCard post={igPost} />
                         )}
                       </Fragment>
@@ -424,7 +432,7 @@ export default async function Blog({
                   })}
                 </div>
               </div>
-            ) : pinnedPosts.length > 0 ? (
+            ) : pinnedPosts.length > 0 && instagramFeed.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <InstagramBlogCard post={instagramFeed[0]} />
               </div>
