@@ -81,6 +81,9 @@ services:
       target: deps
     container_name: houseforce-dev-frontend
     command: npm run dev
+    environment:
+      STRAPI_INTERNAL_URL: http://backend:1337
+      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
     volumes:
       - ./frontend:/app
       - /app/node_modules
