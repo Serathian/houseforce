@@ -60,6 +60,8 @@ export default {
           'api::update.update.findOne',
           'api::update-message.update-message.create',
           'api::update-message.update-message.find',
+          'api::user-preference.user-preference.getPreferences',
+          'api::user-preference.user-preference.updatePreferences',
         ];
 
         for (const action of authActions) {
