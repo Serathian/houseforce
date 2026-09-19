@@ -1,6 +1,11 @@
 import crypto from 'node:crypto';
 
 export default (plugin: any) => {
+  // Unhide provider so it is included in Content Manager API responses and visible in CMS table
+  if (plugin.contentTypes?.user?.config?.attributes?.provider) {
+    plugin.contentTypes.user.config.attributes.provider.hidden = false;
+  }
+
   // Override Content Manager User controller
   if (plugin.controllers?.contentmanageruser?.create) {
     const originalContentManagerCreate = plugin.controllers.contentmanageruser.create;

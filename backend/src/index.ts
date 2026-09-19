@@ -5,8 +5,13 @@ export default {
   /**
    * An asynchronous register function that runs before
    * your application is initialized.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Unhide provider so it is included in Content Manager API responses and visible to admins
+    const userModel = strapi.getModel('plugin::users-permissions.user') as any;
+    if (userModel?.config?.attributes?.provider) {
+      userModel.config.attributes.provider.hidden = false;
+    }
+  },
 
   /**
    * An asynchronous bootstrap function that runs before
@@ -122,6 +127,11 @@ export default {
       // 1. In list view: show id, username, email, confirmed, provider for quick overview
       // 2. In edit view: hide password, provider, confirmed, and role so admins only need to enter username & email
       try {
+        const userModel = strapi.getModel('plugin::users-permissions.user') as any;
+        if (userModel?.config?.attributes?.provider) {
+          userModel.config.attributes.provider.hidden = false;
+        }
+
         const userConfigKey = 'plugin_content_manager_configuration_content_types::plugin::users-permissions.user';
         const userConfigEntry = await strapi.db.query('strapi::core-store').findOne({ where: { key: userConfigKey } });
         if (userConfigEntry && userConfigEntry.value) {
