@@ -79,7 +79,11 @@ export const authOptions: NextAuthOptions = {
           // Note: In Strapi Admin -> Settings -> Roles & Permissions -> Advanced, 
           // "Enable sign-ups" MUST be set to FALSE for the invitation-only flow to work.
           const strapiUrl = process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL;
-          const res = await fetch(`${strapiUrl}/api/auth/google/callback?access_token=${account.access_token}`);
+          const res = await fetch(`${strapiUrl}/api/auth/google/callback?access_token=${account.access_token}`, {
+            headers: {
+              'x-forwarded-proto': 'https',
+            },
+          });
           const data = await res.json();
           
           if (!res.ok || data.error) {

@@ -31,7 +31,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       sessions: {
         httpOnly: true,
         cookie: {
-          secure: env.bool('COOKIE_SECURE', process.env.NODE_ENV === 'production'),
+          secure: env.bool('COOKIE_SECURE', false),
         },
       },
     },
