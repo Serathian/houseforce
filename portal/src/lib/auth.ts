@@ -22,9 +22,14 @@ export const authOptions: NextAuthOptions = {
               password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-              if (!credentials?.identifier || !credentials?.password) {
-                return null;
-              }
+              const identifier =
+                credentials?.identifier ||
+                process.env.SEED_CLIENT_EMAIL ||
+                "client@example.com";
+              const password =
+                credentials?.password ||
+                process.env.SEED_CLIENT_PASSWORD ||
+                "password123";
               try {
                 const strapiUrl =
                   process.env.STRAPI_INTERNAL_URL ||
@@ -35,8 +40,8 @@ export const authOptions: NextAuthOptions = {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    identifier: credentials.identifier,
-                    password: credentials.password,
+                    identifier,
+                    password,
                   }),
                 });
 

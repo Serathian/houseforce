@@ -1151,7 +1151,9 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    provider: Schema.Attribute.String;
+    provider: Schema.Attribute.Enumeration<['google', 'local']> &
+      Schema.Attribute.Configurable &
+      Schema.Attribute.DefaultTo<'google'>;
     publishedAt: Schema.Attribute.DateTime;
     readNotificationIds: Schema.Attribute.JSON;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;

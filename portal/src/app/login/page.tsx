@@ -3,9 +3,9 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import SpinningWheel from "@/components/SpinningWheel";
-import { Mail, Key, Sparkles, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, AlertCircle } from "lucide-react";
 
 const isDevMode =
   process.env.NODE_ENV !== "production" ||
@@ -15,25 +15,22 @@ function LoginCenterNode() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
-  const [email, setEmail] = useState("client@example.com");
-  const [password, setPassword] = useState("password123");
-  const [showDevForm, setShowDevForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleCredentialsLogin = async (loginEmail = email, loginPassword = password) => {
+  const handleDevBypassLogin = async () => {
     setIsLoading(true);
     setAuthError(null);
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        identifier: loginEmail,
-        password: loginPassword,
+        identifier: "client@example.com",
+        password: "password123",
         callbackUrl: "/",
       });
 
       if (res?.error) {
-        setAuthError("Invalid email or password");
+        setAuthError("Dev login failed. Check backend.");
         setIsLoading(false);
       } else if (res?.url) {
         window.location.href = res.url;
@@ -79,98 +76,18 @@ function LoginCenterNode() {
         Sign in with Google
       </button>
 
-      {/* Dev Mode Email Sign-In (Excluded in Production) */}
+      {/* Dev Mode 1-Click Bypass Button (Excluded in Production) */}
       {isDevMode && (
         <div className="w-full flex flex-col items-center mt-1">
           <button
             type="button"
-            onClick={() => setShowDevForm(!showDevForm)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors bg-white/90 hover:bg-white px-3.5 py-1.5 rounded-full border border-slate-200/90 shadow-md backdrop-blur-sm cursor-pointer"
+            disabled={isLoading}
+            onClick={handleDevBypassLogin}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-slate-950 transition-all bg-white/90 hover:bg-white px-4 py-2 rounded-full border border-slate-200/90 shadow-md hover:shadow-lg backdrop-blur-sm cursor-pointer disabled:opacity-50 hover:scale-105 active:scale-95"
           >
-            <span>🛠️ Local Dev Sign-In</span>
-            {showDevForm ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>{isLoading ? "Signing in..." : "⚡ 1-Click Dev Sign-In"}</span>
           </button>
-
-          <AnimatePresence>
-            {showDevForm && (
-              <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="w-72 sm:w-80 mt-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200 flex flex-col gap-3 text-left"
-              >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold text-slate-700">Email & Password</span>
-                  <span className="text-[10px] font-semibold bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-200/60">
-                    Local Dev
-                  </span>
-                </div>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleCredentialsLogin();
-                  }}
-                  className="flex flex-col gap-2.5"
-                >
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800"
-                        placeholder="client@example.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Key className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800"
-                        placeholder="••••••••"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full mt-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
-                  >
-                    {isLoading ? "Signing in..." : "Sign In with Credentials"}
-                  </button>
-                </form>
-
-                <div className="pt-2 border-t border-slate-100 flex flex-col items-center">
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => handleCredentialsLogin("client@example.com", "password123")}
-                    className="w-full flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold py-1.5 px-2 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-amber-500" />
-                    <span>1-Click Login (client@example.com)</span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       )}
     </div>

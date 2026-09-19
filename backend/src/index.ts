@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { Core } from '@strapi/strapi';
 
 export default {
@@ -80,15 +81,88 @@ export default {
         }
       }
 
-      // Add Lifecycle hook to default provider to 'google' for new users created in Admin Panel
+      // Lifecycle hook: All real client accounts in HouseForce use Google OAuth.
+      // Only the dedicated dev/test seed user (client@example.com) should keep 'local'.
       strapi.db.lifecycles.subscribe({
         models: ['plugin::users-permissions.user'],
         async beforeCreate(event) {
           if (event.params.data) {
-            event.params.data.provider = event.params.data.provider || 'google';
+            const isDevSeedUser =
+              event.params.data.email === 'client@example.com' ||
+              (process.env.SEED_CLIENT_EMAIL && event.params.data.email === process.env.SEED_CLIENT_EMAIL);
+
+            if (!isDevSeedUser) {
+              event.params.data.provider = 'google';
+            } else {
+              event.params.data.provider = 'local';
+            }
+
+            // If no password provided (e.g. created in CMS without password field),
+            // assign a secure random dummy password so the DB column & Strapi model are satisfied.
+            if (!event.params.data.password) {
+              event.params.data.password = crypto.randomUUID() + '!Aa1';
+            }
           }
         },
       });
+
+      // Auto-heal existing portal users: any non-dev user set to 'local' must be 'google'
+      try {
+        const devEmail = process.env.SEED_CLIENT_EMAIL || 'client@example.com';
+        await strapi.db.connection.raw(`
+          UPDATE up_users 
+          SET provider = 'google' 
+          WHERE email != '${devEmail}' AND provider != 'google';
+        `);
+      } catch (healErr) {
+        // Table might not exist yet on initial initialization
+      }
+
+      // Configure CMS Content Manager layout for User:
+      // 1. Show provider in list view and edit layout
+      // 2. Hide password from the edit layout so admins don't see or type passwords
+      try {
+        const userConfigKey = 'plugin_content_manager_configuration_content_types::plugin::users-permissions.user';
+        const userConfigEntry = await strapi.db.query('strapi::core-store').findOne({ where: { key: userConfigKey } });
+        if (userConfigEntry && userConfigEntry.value) {
+          const config = JSON.parse(userConfigEntry.value);
+
+          // List view: ensure provider is visible
+          if (!config.layouts.list.includes('provider')) {
+            config.layouts.list.push('provider');
+          }
+
+          // Edit view: remove password from layout rows
+          if (Array.isArray(config.layouts?.edit)) {
+            config.layouts.edit = config.layouts.edit
+              .map((row: any[]) => row.filter((field: any) => field.name !== 'password'))
+              .filter((row: any[]) => row.length > 0);
+
+            // Edit view: ensure provider is in edit layout alongside basic fields
+            const hasProviderInEdit = config.layouts.edit.some((row: any[]) =>
+              row.some((field: any) => field.name === 'provider')
+            );
+            if (!hasProviderInEdit) {
+              config.layouts.edit.unshift([{ name: 'provider', size: 6 }]);
+            }
+          }
+
+          // Metadatas: hide password, show provider
+          if (config.metadatas?.password?.edit) {
+            config.metadatas.password.edit.visible = false;
+          }
+          if (config.metadatas?.provider?.edit) {
+            config.metadatas.provider.edit.visible = true;
+          }
+
+          await strapi.db.query('strapi::core-store').update({
+            where: { key: userConfigKey },
+            data: { value: JSON.stringify(config) },
+          });
+        }
+      } catch (confErr) {
+        console.warn('[Strapi Bootstrap] Failed to update User CMS layout:', confErr);
+      }
 
       // Seed test data if requested (e.g. CI/CD or local Docker stack)
       if (process.env.SEED_TEST_DATA === 'true') {

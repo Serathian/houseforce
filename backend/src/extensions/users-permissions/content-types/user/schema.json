@@ -27,8 +27,13 @@
       "required": true
     },
     "provider": {
-      "type": "string",
-      "configurable": false
+      "type": "enumeration",
+      "enum": [
+        "google",
+        "local"
+      ],
+      "default": "google",
+      "configurable": true
     },
     "password": {
       "type": "password",
