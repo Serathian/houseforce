@@ -137,16 +137,29 @@ export default {
         if (userConfigEntry && userConfigEntry.value) {
           const config = JSON.parse(userConfigEntry.value);
 
-          // List view: ensure provider and confirmed are visible
-          if (!config.layouts.list.includes('provider')) {
-            config.layouts.list.push('provider');
-          }
+          // List view: keep table overview clean (id, username, email, confirmed)
+          // Exclude internal auth & portal state: provider, password, role, readNotificationIds, hasCompletedNotificationOnboarding
+          const listFieldsToExclude = [
+            'provider',
+            'password',
+            'role',
+            'hasCompletedNotificationOnboarding',
+            'readNotificationIds',
+          ];
+          config.layouts.list = config.layouts.list.filter((f: string) => !listFieldsToExclude.includes(f));
           if (!config.layouts.list.includes('confirmed')) {
             config.layouts.list.push('confirmed');
           }
 
-          // Edit view: strip fields that are automatically handled by the system
-          const fieldsToHide = ['password', 'provider', 'confirmed', 'role'];
+          // Edit view: strip fields that are automatically handled by the system or internal portal state
+          const fieldsToHide = [
+            'password',
+            'provider',
+            'confirmed',
+            'role',
+            'hasCompletedNotificationOnboarding',
+            'readNotificationIds',
+          ];
 
           if (Array.isArray(config.layouts?.edit)) {
             config.layouts.edit = config.layouts.edit
@@ -154,7 +167,7 @@ export default {
               .filter((row: any[]) => row.length > 0);
           }
 
-          // Metadatas: mark automated fields as invisible in edit view
+          // Metadatas: mark automated and internal fields as invisible in edit view
           for (const field of fieldsToHide) {
             if (config.metadatas?.[field]?.edit) {
               config.metadatas[field].edit.visible = false;
