@@ -119,40 +119,36 @@ export default {
       }
 
       // Configure CMS Content Manager layout for User:
-      // 1. Show provider in list view and edit layout
-      // 2. Hide password from the edit layout so admins don't see or type passwords
+      // 1. In list view: show id, username, email, confirmed, provider for quick overview
+      // 2. In edit view: hide password, provider, confirmed, and role so admins only need to enter username & email
       try {
         const userConfigKey = 'plugin_content_manager_configuration_content_types::plugin::users-permissions.user';
         const userConfigEntry = await strapi.db.query('strapi::core-store').findOne({ where: { key: userConfigKey } });
         if (userConfigEntry && userConfigEntry.value) {
           const config = JSON.parse(userConfigEntry.value);
 
-          // List view: ensure provider is visible
+          // List view: ensure provider and confirmed are visible
           if (!config.layouts.list.includes('provider')) {
             config.layouts.list.push('provider');
           }
+          if (!config.layouts.list.includes('confirmed')) {
+            config.layouts.list.push('confirmed');
+          }
 
-          // Edit view: remove password from layout rows
+          // Edit view: strip fields that are automatically handled by the system
+          const fieldsToHide = ['password', 'provider', 'confirmed', 'role'];
+
           if (Array.isArray(config.layouts?.edit)) {
             config.layouts.edit = config.layouts.edit
-              .map((row: any[]) => row.filter((field: any) => field.name !== 'password'))
+              .map((row: any[]) => row.filter((field: any) => !fieldsToHide.includes(field.name)))
               .filter((row: any[]) => row.length > 0);
+          }
 
-            // Edit view: ensure provider is in edit layout alongside basic fields
-            const hasProviderInEdit = config.layouts.edit.some((row: any[]) =>
-              row.some((field: any) => field.name === 'provider')
-            );
-            if (!hasProviderInEdit) {
-              config.layouts.edit.unshift([{ name: 'provider', size: 6 }]);
+          // Metadatas: mark automated fields as invisible in edit view
+          for (const field of fieldsToHide) {
+            if (config.metadatas?.[field]?.edit) {
+              config.metadatas[field].edit.visible = false;
             }
-          }
-
-          // Metadatas: hide password, show provider
-          if (config.metadatas?.password?.edit) {
-            config.metadatas.password.edit.visible = false;
-          }
-          if (config.metadatas?.provider?.edit) {
-            config.metadatas.provider.edit.visible = true;
           }
 
           await strapi.db.query('strapi::core-store').update({
