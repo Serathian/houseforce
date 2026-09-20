@@ -8,7 +8,7 @@
     "description": "A customer construction/renovation project"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

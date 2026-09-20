@@ -371,6 +371,36 @@ export default {
           }
         }
 
+        // Ensure all demo updates are linked to their corresponding projects
+        for (const demo of demoProjects) {
+          const project = (await strapi.db.query('api::project.project').findOne({
+            where: { title: demo.title },
+          })) as any;
+
+          if (project) {
+            for (const upd of demo.updates) {
+              const updates = (await strapi.db.query('api::update.update').findMany({
+                where: { title: upd.title },
+              })) as any[];
+
+              for (const u of updates) {
+                const existingLnk = await strapi.db.connection('updates_project_lnk')
+                  .where({ update_id: u.id, project_id: project.id })
+                  .first();
+
+                if (!existingLnk) {
+                  await strapi.db.connection('updates_project_lnk').insert({
+                    update_id: u.id,
+                    project_id: project.id,
+                    update_ord: 1,
+                  });
+                  console.log(`[Strapi Bootstrap] Restored link between update "${u.title}" (#${u.id}) and project "${project.title}" (#${project.id})`);
+                }
+              }
+            }
+          }
+        }
+
         // 5. Ensure all messages are linked to both draft and published update versions
         try {
           await strapi.db.connection.raw(`
